@@ -3,9 +3,10 @@
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
     <HeaderBar/>
-    <NavBar/>
+    <NavBar register="false"/>
     <main>
-      <TilesBackground/>
+      <ItemTiles/>
+      <SignLogInForm/>
     </main>
   </div>
 </template>
@@ -14,7 +15,8 @@
 import HelloWorld from './components/HelloWorld.vue'
 import HeaderBar from './components/HeaderBar.vue'
 import NavBar from './components/NavBar.vue'
-import TilesBackground from './components/TilesBackground.vue'
+import ItemTiles from './components/ItemTiles.vue'
+import SignLogInForm from './components/SignLogInForm.vue'
 
 export default {
   name: 'App',
@@ -22,7 +24,8 @@ export default {
     HelloWorld,
     HeaderBar,
     NavBar,
-    TilesBackground
+    ItemTiles,
+    SignLogInForm
   }
 }
 </script>

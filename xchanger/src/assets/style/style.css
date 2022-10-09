@@ -59,13 +59,16 @@ header{
 }  
 
 .article-tile{
+    text-align: center;
     border-radius: 10px;
     background: floralwhite;
     overflow: hidden;
     margin: 4px;
-    padding: 5px;
-
-    
+    padding: 5px;   
+   
+}  
+.article-tile h5{
+    font-weight: 1000;
    
 }  
 .article-tile:hover{
