@@ -1,34 +1,6 @@
-<!DOCTYPE html>
-<html lang="pl-PL">
-
-<head>
-
-    <meta charset="UTF-8">
-    <title> Xchanger </title>
-    
-   
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css" /> 
-    <link rel="stylesheet" href="../font-awesome-4.7.0/css/font-awesome.min.css">
-    <script type="text/javascript" src="../helperScripts/slideshow.js"></script>
-
-  
-    <!-- <script src="https://kit.fontawesome.com/c1c6f1b74e.js" crossorigin="anonymous"></script> -->
-</head>
-
-<body>
-
-<header>
-
-
-
-
-
-
-<img src= "../images/logo_xchanger.png" alt=" EKOŁO Logo" width="170" height="50">
-
-
-
+<template>
+ <header>
+<img src= "../assets/images/logo_xchanger.png" alt=" EKOŁO Logo" width="170" height="50">
     
 
       <div class="dropdown">
@@ -44,7 +16,7 @@
                 <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
                 <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
               </svg>
-          </i></a>
+          </a>
           <a href="#">Zaloguj się
             <svg  width="18" height="18" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
                 <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15H1.5zM11 2h.5a.5.5 0 0 1 .5.5V15h-1V2zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
@@ -63,61 +35,16 @@
           </a>
         </div>
       </div>
-    
-  </div>
-
-  
+     
 
 </header>
 
-<nav>
+</template>
 
-<ul>
-    <li><a href="../index.html"class="active">Strona Główna </a> </li>
-    <li><div class="dropdown">
-       <a href="" >Kategorie </a>
-        <div class="dropdown-content">
-          <a href="#">Elektronika
-          </a>
-          <a href="#">Sport
-          </a>
-          <a href="#">Literatura
-          </a>
-        </div>
-      </div></li>
-    
-</ul>
-
-</nav>
-
-<main>
-
-<div class="main-main">
- 
-  <div class="article-tile">
-    <img  src="../images/kask3.png" alt="Card image cap">
-      <h5 class="card-title">Kask Bell</h5>
-      <p class="card-text">Some quick example text to build on the Kask Bell and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-dark"><i class="fa fa-pencil"></i></a>
-      <a href="#" class="btn btn-secondary"><i class="fa fa-close"></i></a>
-  </div>
+<script>
+export default {
+  name: 'HeaderBar'
+}
+</script>
 
 
-
-
-</div>
-</main>
-
-<footer>
-  <h6>Xchanger</h6>
-  Platforma do wymiany wszelkiego rodzaju przedmiotów działająca zgodnie z postawą "anti-waste", sprzyjająca rozwojowi gospodarki o obiegu zamkniętym, gdzię jak najmniej artykułów codziennego użytku kończy przedwcześnie swój żywot na wysypisku lub zapomniane, na strychu. Dzięki naszemu portalowi sprawisz, że twoje rzeczy trafią do nowego właściciela, bez żadnych pośredników, a co za tym idzie bez generowania zbędnych kosztów dla Ciebie oraz planety, przy jednoczesnym zapewnieniu, że otrzymasz w zamian to czego potrzebujesz.
-
-</footer>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script> 
-
-</body>
-
-</html>

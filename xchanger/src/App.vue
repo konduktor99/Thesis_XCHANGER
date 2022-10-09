@@ -1,0 +1,41 @@
+<template>
+  <div id="app">
+    <img alt="Vue logo" src="./assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HeaderBar/>
+    <NavBar/>
+    <main>
+      <TilesBackground/>
+    </main>
+  </div>
+</template>
+
+<script>
+import HelloWorld from './components/HelloWorld.vue'
+import HeaderBar from './components/HeaderBar.vue'
+import NavBar from './components/NavBar.vue'
+import TilesBackground from './components/TilesBackground.vue'
+
+export default {
+  name: 'App',
+  components: {
+    HelloWorld,
+    HeaderBar,
+    NavBar,
+    TilesBackground
+  }
+}
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  color: #2c3e50;
+  background: rgb(250, 250, 250);
+}
+
+@import './assets/style/style.css'
+</style>
