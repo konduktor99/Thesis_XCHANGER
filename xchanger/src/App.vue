@@ -1,33 +1,35 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
     <HeaderBar/>
     <NavBar register="false"/>
     <main>
-      <ItemTiles/>
-      <SignLogInForm/>
+      <router-view/>
+        
     </main>
+    <FooterBar/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import HeaderBar from './components/HeaderBar.vue'
+import FooterBar from './components/FooterBar.vue'
 import NavBar from './components/NavBar.vue'
-import ItemTiles from './components/ItemTiles.vue'
-import SignLogInForm from './components/SignLogInForm.vue'
+//import ItemDetails from './components/ItemDetails.vue'
+
+//import ItemTiles from './components/ItemTiles.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
     HeaderBar,
     NavBar,
-    ItemTiles,
-    SignLogInForm
-  }
-}
+    FooterBar,
+    //ItemDetails
+//    ItemTiles
+  },
+   
+};
+
 </script>
 
 <style>

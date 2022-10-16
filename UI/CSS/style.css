@@ -163,7 +163,7 @@ header{
     background: floralwhite;
   }
 
-  .details-item, .sign-log-in-form a{
+  .details-item a, .sign-log-in-form a{
     cursor: pointer;
     text-decoration: none;
     color: grey;

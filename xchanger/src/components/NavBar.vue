@@ -2,7 +2,7 @@
  <nav>
 
 <ul>
-    <li><a href="../index.html" class="active">Strona Główna </a> </li>
+    <li><router-link to="/">Strona Główna </router-link> </li>
     <li><div class="dropdown">
        <a href="" >Kategorie </a>
         <div class="dropdown-content">

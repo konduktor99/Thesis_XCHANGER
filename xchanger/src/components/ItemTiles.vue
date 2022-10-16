@@ -1,10 +1,12 @@
 <template>
-
+<div>
+<router-view/>
 <div class="main-main">
  
+
   <ItemTile v-for="item in items" :key="item" :title="item.title" :desc=item.desc />
  
-
+</div>
 </div>
 
 

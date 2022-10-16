@@ -164,7 +164,7 @@ header{
     background: floralwhite;
   }
 
-  .details-item, .sign-log-in-form a{
+  .details-item a, .sign-log-in-form a{
     cursor: pointer;
     text-decoration: none;
     color: grey;
@@ -402,14 +402,14 @@ form label{
 form input.error-input,
 form select.error-input,
 form textarea.error-input {
-    border: 3px solid rgb(189, 110, 110);
+    border: 2px solid rgb(189, 110, 110);
     
 }
 
 form input.correct-input,
 form select.correct-input,
 form textarea.correct-input {
-    border: 3px solid rgb(97, 194, 97);
+    border: 2px solid rgb(97, 194, 97);
     
 }
 
