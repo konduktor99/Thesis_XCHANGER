@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <HeaderBar/>
+  <div id="app" >
+    <HeaderBar v-bind:loggedIn="true"/>
     <NavBar register="false"/>
     <main>
       <router-view/>
@@ -37,6 +37,7 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
   
   color: #2c3e50;
   background: rgb(250, 250, 250);

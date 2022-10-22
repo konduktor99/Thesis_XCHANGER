@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: 'HeaderBar'
+  name: 'NavBar'
 }
 </script>
 

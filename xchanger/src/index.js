@@ -3,6 +3,8 @@ import ItemTiles from './components/ItemTiles.vue'
 import LogInForm from './components/LogInForm.vue'
 import SignInForm from './components/SignInForm.vue'
 import ItemDetails from './components/ItemDetails.vue'
+import NotFound from './components/NotFound.vue'
+
 
 const routes = [
   // {
@@ -14,11 +16,16 @@ const routes = [
     
   // },
   {
+
+    path: '/',
+    redirect: '/items'
+  },
+  {
     path: '/signin',
     component: SignInForm
   },
   {
-    path: '/',
+    path: '/items',
     component: ItemTiles,
     children: [
 
@@ -26,8 +33,16 @@ const routes = [
     ],
   },
   {
-    path: '/item',
+    path: '/items/:id',
     component: ItemDetails,
+    props: true
+    //props: {imageUrl: require("../assets/images/kask.png")}
+  },
+
+  {
+    path: '/:pathMatch(.*)*',
+    component: NotFound,
+    //props: {imageUrl: require("../assets/images/kask.png")}
   }
 
 ]

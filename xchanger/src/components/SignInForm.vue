@@ -162,7 +162,7 @@ export default {
 
             if (!this.password) {
                 errorText = "Podaj hasło."
-                this.emailError = errorText
+                this.passwordError = errorText
                 this.error.push(errorText)
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
@@ -199,10 +199,12 @@ export default {
 
             if (!this.password) {
                 errorText = "Podaj hasło."
-                this.emailError = errorText
+                this.passConfError = errorText
                 this.error.push(errorText)
                 document.getElementById("password").classList.remove("correct-input");
                 document.getElementById("password").classList.add("error-input");
+                input.classList.remove("correct-input");
+                input.classList.add("error-input");
                 return false
             }
             if (!this.passwordConf) {

@@ -1,11 +1,16 @@
 <template>
 <div>
-<router-view/>
+  <transition name="fade">
+    <router-view/>
+  </transition>
+
 <div class="main-main">
  
 
-  <ItemTile v-for="item in items" :key="item" :title="item.title" :desc=item.desc />
- 
+  <router-link v-for="item in items" :key="item" :to=" `/items/${item.id}`" style="text-decoration: none; color: inherit; ">
+  <ItemTile  :title="item.title" :desc=item.desc />
+  </router-link>
+
 </div>
 </div>
 
@@ -25,14 +30,20 @@ export default {
     return{
       items: [
         {
+          id: 1,
+          user: "gipsu99",
           title: "Kask bell",
           desc: "Some quick example text to build on the Kask Bell and make up the bulk of the card's content."
         },
         {
+          id: 2,
+          user: "_konduktor_",
           title: "Kask",
           desc: "blablablabalbalabalblb ablblblbabl bbbbjfilenlcekcddcewdukjwrhurwkjh."
         },
         {
+          id: 3,
+          user: "ochrzan",
           title: "Nie Kask",
           desc: "XDDDDDDDDDDDDDDDDDDDD."
         }
@@ -41,5 +52,26 @@ export default {
   }
 }
 </script>
+<style>
+.fade-enter-from,
+.fade-leave-to{
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from{
+  opacity: 1;
+}
+
+
+.fade-enter-active{
+  transition: all 1.5s ease;
+}
+.fade-leave-active{
+  transition: all 0.5s ease;
+ 
+}
+
+</style>
 
 
