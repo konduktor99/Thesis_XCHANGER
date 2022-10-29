@@ -2,13 +2,16 @@
 
  <div class="article-tile">
     <img  src="../assets/images/kask3.png" />
-          <div class="article-tile-buttons">
-      <button href="#" class="btn btn-dark  btn-block btn-space"><i class="fa fa-pencil"></i></button>
-      <button href="#" class="btn btn-secondary " style="margin-left:5px;"><i class="fa fa-close"></i></button>
-      </div>
-      <h5 >{{title}}</h5>
-      <p >{{desc}}</p>
+    <h5 >{{title}}</h5>
+    <p >{{desc}}</p>
+    
+    
 
+    <div class="article-tile-buttons" v-if="modify">
+        <router-link to="" class="btn btn-dark"><i class="fa fa-pencil"></i></router-link>
+        <a href="#" class="btn btn-secondary" style="margin-left:5px;"><i class="fa fa-close" ></i></a>
+    </div>
+      
 
   </div>
 </template>
@@ -21,12 +24,11 @@ export default {
    props: {
     title: String,
     desc: String,
+    id:Number,
+    modify: Boolean,
+    
+  
     
   }
 }
 </script>
-
-
-<style scoped>
-
-</style>

@@ -4,7 +4,6 @@
     <NavBar register="false"/>
     <main>
       <router-view/>
-        
     </main>
     <FooterBar/>
   </div>

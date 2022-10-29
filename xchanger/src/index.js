@@ -4,6 +4,8 @@ import LogInForm from './components/LogInForm.vue'
 import SignInForm from './components/SignInForm.vue'
 import ItemDetails from './components/ItemDetails.vue'
 import NotFound from './components/NotFound.vue'
+import UserItemTiles from './components/UserItemTiles.vue'
+import ItemForm from './components/ItemForm.vue'
 
 
 const routes = [
@@ -38,12 +40,23 @@ const routes = [
     props: true
     //props: {imageUrl: require("../assets/images/kask.png")}
   },
+  {
+    path: '/my-profile',
+    component: UserItemTiles,
+    //props: {imageUrl: require("../assets/images/kask.png")}
+  },
+  {
+    path: '/my-profile/add-item',
+    component: ItemForm,
+    //props: {imageUrl: require("../assets/images/kask.png")}
+  },
 
   {
     path: '/:pathMatch(.*)*',
     component: NotFound,
     //props: {imageUrl: require("../assets/images/kask.png")}
-  }
+  },
+
 
 ]
 const router = createRouter({

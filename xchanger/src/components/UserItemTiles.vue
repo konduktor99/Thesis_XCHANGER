@@ -6,9 +6,14 @@
 
 <div class="main-main">
  
+  <router-link id="add-article-tile" to="/my-profile/add-item">
+  
+    <i  class="fa fa-plus-square"></i>
+ 
+  </router-link>
 
   <router-link v-for="item in items" :key="item" :to=" `/items/${item.id}`" style="text-decoration: none; color: inherit; ">
-    <ItemTile  :title="item.title" :desc=item.desc v-bind:modify="false"/>
+  <ItemTile v-bind="item"  v-bind:modify="true" />
   </router-link>
 
 </div>

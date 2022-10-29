@@ -4,6 +4,17 @@ import "bootstrap/dist/css/bootstrap.css";
 import "@fortawesome/fontawesome-free/js/all.js";
 //import "./assets/helperScripts/clientValidation/formValidation.js"
 import Router from './index.js'
+import  "vue-google-autocomplete";
+import VueGoogleMaps from '@fawmi/vue-google-maps'
 
 
-createApp(App).use(Router).mount('#app')
+// createApp(App).use(Router).mount('#app')
+createApp(App)
+  .use(VueGoogleMaps, {
+    load: {
+      key: "AIzaSyB2SBS-AKo7ajr2zpRPQrDXz-f8pBdW--M",
+      libraries: "places"
+    }
+  })
+  .use(Router)
+  .mount("#app");
