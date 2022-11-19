@@ -24,16 +24,16 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetExchanges()
         {
             try
             {
-                var items = await _repository.GetItemsAsync();
+                var exchanges = await _repository.GetExchangesAsync();
 
-                if (items.Count() > 0)
-                    return Ok(items);
+                if (exchanges.Count() > 0)
+                    return Ok(exchanges);
                 else
-                    return NotFound("Nie znaleziono przedmiotów");
+                    return NotFound("Nie znaleziono transakcji wymiany");
 
             }
             catch(Exception)
@@ -45,17 +45,17 @@ namespace Xchanger_RestApi.Controllers
             
         }
 
-        [HttpGet("{idItem}")]
-        public async Task<IActionResult> GetPrescription([FromRoute] int idItem)
+        [HttpGet("{idExchange}")]
+        public async Task<IActionResult> GetExchange([FromRoute] int idExchange)
         {
             try
             {
-                var item =await _repository.GetItemAsync(idItem);
+                var exchange =await _repository.GetExchangeAsync(idExchange);
 
-                if (item != null)
-                    return Ok(item);
+                if (exchange != null)
+                    return Ok(exchange);
                 else
-                    return NotFound("Nie znaleziono przedmiotu");
+                    return NotFound("Nie znaleziono takiej transakcji");
 
             }
             catch (Exception)
@@ -66,15 +66,15 @@ namespace Xchanger_RestApi.Controllers
 
         }
 
-        [HttpPost("CreateItem")]
-        public async Task<IActionResult> CreateItem([FromBody] ItemDTO itemDTO)
+        [HttpPost("CreateExchange")]
+        public async Task<IActionResult> CreateItem([FromBody] RequestExchangeDTO exchangeDTO)
         {
             try
             {
-                var item = await _repository.CreateItemAsync(itemDTO);
+                var exchange = await _repository.CreateExchangeAsync(exchangeDTO);
               
 
-                    return Ok(item);
+                    return Ok(exchange);
 
             }
             catch (Exception ex)
@@ -84,17 +84,17 @@ namespace Xchanger_RestApi.Controllers
 
         }
 
-        [HttpPut("{idItem}")]
-        public async Task<IActionResult> UpdateItem([FromBody] ItemDTO itemDTO, [FromRoute] int idItem)
+        [HttpPut("{idExchange}")]
+        public async Task<IActionResult> UpdateItem([FromBody] ItemDTO exchangeDTO, [FromRoute] int idExchange)
         {
             try
             {
-                var item = await _repository.UpdateItemAsync(idItem, itemDTO);
+                var exchange = await _repository.UpdateExchangeAsync(idExchange, exchangeDTO);
 
-                if (item == null)
+                if (exchange == null)
                     return NotFound("Nie znaleziono przedmiotu");
 
-                return Ok(item);
+                return Ok(exchange);
 
             }
             catch (Exception ex)

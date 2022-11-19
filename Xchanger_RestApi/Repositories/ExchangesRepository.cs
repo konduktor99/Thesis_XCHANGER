@@ -18,54 +18,72 @@ namespace Xchanger_RestApi.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Item>> GetItemsAsync()
+        public async Task<IEnumerable<Exchange>> GetReceivedExchangesAsync()
         {
-            return await _dbContext.Items.ToListAsync();
+            return await _dbContext.Exchanges.ToListAsync();
         }
 
-        public async Task<Item> GetItemAsync(int idItem)
+        public async Task<IEnumerable<Exchange>> GetRequestedExchangesAsync()
         {
-            var item = await _dbContext.Items.FirstOrDefaultAsync(i => i.Id == idItem);
-            return item;
+            return await _dbContext.Exchanges.ToListAsync();
         }
 
-
-        public async Task<Item> CreateItemAsync(ItemDTO itemDTO)
+        public async Task<Exchange> GetExchangeAsync(int idExchange)
         {
-            Item item = new Item();
-            item.Title = itemDTO.Title;
-            item.Description = itemDTO.Description;
-           // item.Categories = await _dbContext.Categories.Where(c => c.Id == itemDTO.CategoryId).FirstOrDefaultAsync();
-           // item.Users = await _dbContext.Users.Where(c => c.Id == itemDTO.UserId).FirstOrDefaultAsync();
-            item.UsersId = itemDTO.UserId;  //itemDTO.CategoryId;
-            item.CategoriesId = itemDTO.CategoryId;
-            item.PublicationDate = DateTime.Today;
+            var exchange = await _dbContext.Exchanges.FirstOrDefaultAsync(i => i.Id == idExchange);
+            return exchange;
+        }
 
-
-           
-            await _dbContext.Items.AddAsync(item);
+        public async Task<Exchange> RequestExchangeAsync(RequestExchangeDTO reqExchangeDTO)
+        {
+            Exchange exchange = new Exchange();
+            exchange.RequestDate = DateTime.Now;
+            exchange.AcceptDate = null;
+            exchange.Items =await  _dbContext.Items.Where(i => i.Id ==reqExchangeDTO.ItemId).FirstOrDefaultAsync();
+            exchange.ItemId = reqExchangeDTO.ItemId;
+            exchange.State = 0;
+          
+            await _dbContext.Exchanges.AddAsync(exchange);
             await _dbContext.SaveChangesAsync();
-            return item;
+            return exchange;
         }
 
-        public async Task<Item> UpdateItemAsync(int idItem, ItemDTO itemDTO)
+        public async Task<Exchange> ReplyExchangeAsync(int idExchange, ReplyExchangeDTO repExchangeDTO)
         {
             
-            var item = await GetItemAsync(idItem);
+            var exchange = await GetExchangeAsync(idExchange);
+           
+            exchange.Items2 = await _dbContext.Items.Where(i => i.Id == repExchangeDTO.Item2Id).FirstOrDefaultAsync();
+            exchange.Item2Id = repExchangeDTO.Item2Id;
 
-          
-            item.Title = itemDTO.Title;
-            item.Description = itemDTO.Description;
-            // item.Categories = await _dbContext.Categories.Where(c => c.Id == itemDTO.CategoryId).FirstOrDefaultAsync();
-            // item.Users = await _dbContext.Users.Where(c => c.Id == itemDTO.UserId).FirstOrDefaultAsync();
-            //item.UsersId = itemDTO.UserId;  //itemDTO.CategoryId;
-            item.CategoriesId = itemDTO.CategoryId;
-            item.PublicationDate = DateTime.Today;
-
-
-            _dbContext.Entry(item).State = EntityState.Modified;
+            _dbContext.Entry(exchange).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
-            return item;
+            return exchange;
+        }
+
+        public async Task<Exchange> AcceptExchangeAsync(int idExchange)
+        {
+
+            var exchange = await GetExchangeAsync(idExchange);
+
+            exchange.State = 1;
+
+            _dbContext.Entry(exchange).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            return exchange;
+        }
+
+        public async Task<Exchange> DeleteExchange(int idExchange)
+        {
+            var exchange = await GetExchangeAsync(idExchange);
+
+            if (exchange != null)
+            {
+                _dbContext.Entry(exchange).State = EntityState.Deleted;
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return exchange;
         }
 
     }

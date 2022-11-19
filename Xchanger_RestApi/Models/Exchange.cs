@@ -20,14 +20,14 @@ namespace Xchanger_RestApi.Models
         [Column("state")]
         public byte State { get; set; }
         [Column("Items_id")]
-        public int ItemsId { get; set; }
+        public int ItemId { get; set; }
         [Column("Items_2_id")]
-        public int? Items2Id { get; set; }
+        public int? Item2Id { get; set; }
 
-        [ForeignKey(nameof(ItemsId))]
+        [ForeignKey(nameof(ItemId))]
         [InverseProperty(nameof(Item.ExchangeItems))]
         public virtual Item Items { get; set; }
-        [ForeignKey(nameof(Items2Id))]
+        [ForeignKey(nameof(Item2Id))]
         [InverseProperty(nameof(Item.ExchangeItems2s))]
         public virtual Item Items2 { get; set; }
     }

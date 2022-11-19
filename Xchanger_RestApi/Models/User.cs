@@ -36,6 +36,9 @@ namespace Xchanger_RestApi.Models
         [Column("password_salt")]
         public int? PasswordSalt { get; set; }
 
+        [Column("admin")]
+        public bool? Admin { get; set; }
+
         [InverseProperty(nameof(Item.Users))]
         public virtual ICollection<Item> Items { get; set; }
     }

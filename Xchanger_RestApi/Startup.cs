@@ -34,6 +34,8 @@ namespace Xchanger_RestApi
             services.AddDbContext<XchangerDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddScoped<IItemsRepository, ItemsRepository>();
+            services.AddScoped<IExchangesRepository, ExchangesRepository>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
 
             services.AddSwaggerGen(s => s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {

@@ -16,6 +16,7 @@ namespace Xchanger_RestApi.DTOs
         public string PhoneNumber { get; set; }
         public string PasswordHash { get; set; }
         public int? PasswordSalt { get; set; }
+        public bool Admin { get; set; }
         //public virtual ICollection<Item> Items { get; set; }
     }
 }
