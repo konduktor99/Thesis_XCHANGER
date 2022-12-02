@@ -18,30 +18,32 @@ namespace Xchanger_RestApi.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Exchange>> GetReceivedExchangesAsync()
+        public async Task<IEnumerable<Exchange>> GetReceivedExchangesAsync(int receiverId)
         {
-            return await _dbContext.Exchanges.ToListAsync();
+            return await _dbContext.Exchanges.Where(e => e.Items.UserId == receiverId && e.State == 0).ToListAsync();
         }
 
-        public async Task<IEnumerable<Exchange>> GetRequestedExchangesAsync()
+        public async Task<IEnumerable<Exchange>> GetRequestedExchangesAsync(int initiatorId)
         {
-            return await _dbContext.Exchanges.ToListAsync();
+            return await _dbContext.Exchanges.Where(e => e.Initiator.Id == initiatorId && e.State == 0).ToListAsync();
         }
 
         public async Task<Exchange> GetExchangeAsync(int idExchange)
         {
             var exchange = await _dbContext.Exchanges.FirstOrDefaultAsync(i => i.Id == idExchange);
+
             return exchange;
         }
 
-        public async Task<Exchange> RequestExchangeAsync(RequestExchangeDTO reqExchangeDTO)
+        public async Task<Exchange> RequestExchangeAsync(RequestExchangeDTO reqExchangeDTO, int initiatorId)
         {
             Exchange exchange = new Exchange();
             exchange.RequestDate = DateTime.Now;
-            exchange.AcceptDate = null;
+           
             exchange.Items =await  _dbContext.Items.Where(i => i.Id ==reqExchangeDTO.ItemId).FirstOrDefaultAsync();
             exchange.ItemId = reqExchangeDTO.ItemId;
             exchange.State = 0;
+            exchange.InitiatorId = initiatorId;
           
             await _dbContext.Exchanges.AddAsync(exchange);
             await _dbContext.SaveChangesAsync();
@@ -50,9 +52,7 @@ namespace Xchanger_RestApi.Repositories
 
         public async Task<Exchange> ReplyExchangeAsync(int idExchange, ReplyExchangeDTO repExchangeDTO)
         {
-            
             var exchange = await GetExchangeAsync(idExchange);
-           
             exchange.Items2 = await _dbContext.Items.Where(i => i.Id == repExchangeDTO.Item2Id).FirstOrDefaultAsync();
             exchange.Item2Id = repExchangeDTO.Item2Id;
 
@@ -67,13 +67,14 @@ namespace Xchanger_RestApi.Repositories
             var exchange = await GetExchangeAsync(idExchange);
 
             exchange.State = 1;
-
+            exchange.Items.Active = false;
+            exchange.Items2.Active = false;
             _dbContext.Entry(exchange).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
             return exchange;
         }
 
-        public async Task<Exchange> DeleteExchange(int idExchange)
+        public async Task<Exchange> DeleteExchangeAsync(int idExchange)
         {
             var exchange = await GetExchangeAsync(idExchange);
 
@@ -85,6 +86,14 @@ namespace Xchanger_RestApi.Repositories
 
             return exchange;
         }
+
+        public async Task<IEnumerable<Exchange>> GetExchangesAsync()
+        {
+            return await _dbContext.Exchanges.ToListAsync();
+        }
+
+
+
 
     }
 }

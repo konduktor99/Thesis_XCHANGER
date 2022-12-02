@@ -13,7 +13,7 @@ namespace Xchanger_RestApi.Models
         public Item()
         {
             ExchangeItems = new HashSet<Exchange>();
-            ExchangeItems2s = new HashSet<Exchange>();
+            ExchangeItems2 = new HashSet<Exchange>();
         }
 
         [Key]
@@ -31,20 +31,23 @@ namespace Xchanger_RestApi.Models
         public DateTime PublicationDate { get; set; }
         [Column("new")]
         public bool New { get; set; }
-        [Column("Categories_id")]
-        public int CategoriesId { get; set; }
-        [Column("Users_id")]
-        public int UsersId { get; set; }
+        [Column("active")]
+        public bool Active { get; set; }
 
-        [ForeignKey(nameof(CategoriesId))]
+        [Column("Categories_id")]
+        public int CategoryId { get; set; }
+        [Column("Users_id")]
+        public int UserId { get; set; }
+
+        [ForeignKey(nameof(CategoryId))]
         [InverseProperty(nameof(Category.Items))]
         public virtual Category Categories { get; set; }
-        [ForeignKey(nameof(UsersId))]
+        [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.Items))]
         public virtual User Users { get; set; }
         [InverseProperty(nameof(Exchange.Items))]
         public virtual ICollection<Exchange> ExchangeItems { get; set; }
         [InverseProperty(nameof(Exchange.Items2))]
-        public virtual ICollection<Exchange> ExchangeItems2s { get; set; }
+        public virtual ICollection<Exchange> ExchangeItems2 { get; set; }
     }
 }

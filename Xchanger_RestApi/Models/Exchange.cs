@@ -19,16 +19,22 @@ namespace Xchanger_RestApi.Models
         public DateTime RequestDate { get; set; }
         [Column("state")]
         public byte State { get; set; }
-        [Column("Items_id")]
+        [Column("item_id")]
         public int ItemId { get; set; }
-        [Column("Items_2_id")]
+        [Column("item_2_id")]
         public int? Item2Id { get; set; }
+        [Column("initiator_id")]
+        public int InitiatorId { get; set; }
+
+        [ForeignKey(nameof(InitiatorId))]
+        [InverseProperty(nameof(User.Exchanges))]
+        public virtual User Initiator { get; set; }
 
         [ForeignKey(nameof(ItemId))]
         [InverseProperty(nameof(Item.ExchangeItems))]
         public virtual Item Items { get; set; }
         [ForeignKey(nameof(Item2Id))]
-        [InverseProperty(nameof(Item.ExchangeItems2s))]
+        [InverseProperty(nameof(Item.ExchangeItems2))]
         public virtual Item Items2 { get; set; }
     }
 }

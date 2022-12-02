@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 using Xchanger_RestApi.Models;
 using Xchanger_RestApi.DTOs;
 using Xchanger_RestApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xchanger_RestApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class ItemsController : ControllerBase
     {
 
@@ -24,11 +26,12 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetItems()
+        public async Task<IActionResult> GetActiveItems()
         {
+
             try
             {
-                var items = await _repository.GetItemsAsync();
+                var items = await _repository.GetActiveItemsAsync(null, null);
 
                 if (items.Count() > 0)
                     return Ok(items);
@@ -36,21 +39,84 @@ namespace Xchanger_RestApi.Controllers
                     return NotFound("Nie znaleziono przedmiotów");
 
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
-               
+
             }
 
-            
+
+        }
+        [HttpGet("category/{category?}")]
+        public async Task<IActionResult> GetActiveItemsByCat([FromRoute] string? category =null)
+        {
+
+            try
+            {
+                var items = await _repository.GetActiveItemsAsync(category, null);
+
+                if (items.Count() > 0)
+                    return Ok(items);
+                else
+                    return NotFound("Nie znaleziono przedmiotów");
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
+
+            }
+        }
+        [HttpGet("user/{user?}")]
+      
+        public async Task<IActionResult> GetActiveItemsByUsr([FromRoute] string? user = null)
+        {
+
+            try
+            {
+                var items = await _repository.GetActiveItemsAsync(null, user);
+
+                if (items.Count() > 0)
+                    return Ok(items);
+                else
+                    return NotFound("Nie znaleziono przedmiotów");
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
+            }
+
+        }
+        [HttpGet("category/{category?}/user/{user?}")]
+
+        public async Task<IActionResult> GetActiveItemsByCatUsr([FromRoute] string? category = null, [FromRoute] string? user = null)
+        {
+
+            try
+            {
+                var items = await _repository.GetActiveItemsAsync(category, user);
+
+                if (items.Count() > 0)
+                    return Ok(items);
+                else
+                    return NotFound("Nie znaleziono przedmiotów");
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
+            }
+
         }
 
+
         [HttpGet("{idItem}")]
-        public async Task<IActionResult> GetPrescription([FromRoute] int idItem)
+        public async Task<IActionResult> GetItemDtoAsync([FromRoute] int idItem)
         {
             try
             {
-                var item =await _repository.GetItemAsync(idItem);
+                var item =await _repository.GetItemDtoAsync(idItem);
 
                 if (item != null)
                     return Ok(item);
@@ -79,7 +145,7 @@ namespace Xchanger_RestApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera \n" + ex);
+                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
             }
 
         }
@@ -99,12 +165,12 @@ namespace Xchanger_RestApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera \n" + ex);
+                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
             }
 
         }
         [HttpDelete("DeleteItem/{idItem}")]
-        public async Task<IActionResult> DeleteItem([FromBody] ItemDTO itemDTO, [FromRoute] int idItem)
+        public async Task<IActionResult> DeleteItem([FromRoute] int idItem)
         {
             try
             {
@@ -115,13 +181,14 @@ namespace Xchanger_RestApi.Controllers
 
                 return Ok(item);
 
-            }
+        }
             catch (Exception ex)
             {
-                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera \n" + ex);
-            }
+                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
+    }
 
-        }
+
+}
 
 
 

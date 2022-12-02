@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Xchanger_RestApi.DTOs;
 using Xchanger_RestApi.Models;
@@ -10,9 +9,12 @@ namespace Xchanger_RestApi.Repositories
     public interface IUsersRepository
     {
 
-        public Task<IEnumerable<Item>> GetItemsAsync();
-        public Task<Item> GetItemAsync(int idItem);
-        public Task<Item> CreateItemAsync(ItemDTO itemDTO);
-        public Task<Item> UpdateItemAsync(int idItem, ItemDTO itemDTO);
+        public Task<IEnumerable<User>> GetUsersAsync();
+        public Task<User> GetUserAsync(int idUser);
+        public Task<User> RegisterUserAsync(UserRegisterDTO userDTO);
+        public Task<User> GetUserByUsername(string login);
+        public Task SetUserRefreshTokenAsync(string userLogin, DateTime expireTime, DateTime createTime, string token);
+
+
     }
 }

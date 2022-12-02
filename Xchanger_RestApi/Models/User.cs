@@ -31,15 +31,27 @@ namespace Xchanger_RestApi.Models
         public string PhoneNumber { get; set; }
         [Required]
         [Column("password_hash")]
-        [StringLength(256)]
-        public string PasswordHash { get; set; }
-        [Column("password_salt")]
-        public int? PasswordSalt { get; set; }
 
-        [Column("admin")]
-        public bool? Admin { get; set; }
+        public byte[] PasswordHash { get; set; }
+        [Column("password_salt")]
+        public byte[]? PasswordSalt { get; set; }
+
+        [Column("refresh_token")]
+        [StringLength(64)]
+        public string? RefreshToken { get; set; }
+
+        [Column("refresh_token_expire")]
+        public DateTime? RefreshTokenExpireTime { get; set; }
+
+        [Column("refresh_token_create")]
+        public DateTime? RefreshTokenCreateTime { get; set; }
+
+        //  [Column("admin")]
+        // public bool? Admin { get; set; }
 
         [InverseProperty(nameof(Item.Users))]
         public virtual ICollection<Item> Items { get; set; }
+        [InverseProperty(nameof(Exchange.Initiator))]
+        public virtual ICollection<Exchange> Exchanges { get; set; }
     }
 }
