@@ -15,7 +15,7 @@ namespace Xchanger_RestApi.DTOs
         public string Description { get; set; }
         public DateTime PublicationDate { get; set; }
         public bool New { get; set; }
-
+        public string Location { get; set; }
         public int CategoryId { get; set; }
         public int UserId { get; set; }
      //   public virtual Category Cat { get; set; }

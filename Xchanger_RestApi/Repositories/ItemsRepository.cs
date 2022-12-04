@@ -47,15 +47,13 @@ namespace Xchanger_RestApi.Repositories
                 Active = i.Active,
                 PublicationDate = i.PublicationDate,
                 New = i.New,
+                Location = i.Location,
                 Category = new { Id = i.Categories.Id, Name = i.Categories.Name },
-                User = i.Users.Items.Count() ,//new { Id = i.Users.Id, Login = i.Users.Login },
-                XD = i.ExchangeItems
+                User = new { Id = i.Users.Id, Login = i.Users.Login, PhoneNumber = i.Users.PhoneNumber }
             })
             .FirstOrDefaultAsync();
-            var it = await _dbContext.Items.Where(i => i.Id == idItem)
-           .FirstOrDefaultAsync();
-            var xd = it.ExchangeItems;
-            Console.WriteLine(xd);
+
+          
 
             return item;
         }
@@ -80,6 +78,7 @@ namespace Xchanger_RestApi.Repositories
             item.Description = itemDTO.Description;
             item.UserId = itemDTO.UserId;
             item.CategoryId = itemDTO.CategoryId;
+            item.Location = itemDTO.Location;
             //item.Users = user;
             //item.Categories = category;
             item.PublicationDate = DateTime.Today;

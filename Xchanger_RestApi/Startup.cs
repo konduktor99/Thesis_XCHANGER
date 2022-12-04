@@ -81,6 +81,17 @@ namespace Xchanger_RestApi
                     IssuerSigningKey = new SymmetricSecurityKey(Key)
                 };
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "AllowOrigin",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:8080")
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,6 +105,8 @@ namespace Xchanger_RestApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("AllowOrigin");
 
             app.UseAuthentication();
 

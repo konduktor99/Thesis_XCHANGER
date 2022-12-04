@@ -14,7 +14,7 @@ namespace Xchanger_RestApi.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class ItemsController : ControllerBase
     {
 

@@ -29,48 +29,6 @@ namespace Xchanger_RestApi.Controllers
             _configuration = configuration;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetItems()
-        //{
-        //    try
-        //    {
-        //        var items = await _repository.GetItemsAsync();
-
-        //        if (items.Count() > 0)
-        //            return Ok(items);
-        //        else
-        //            return NotFound("Nie znaleziono przedmiotów");
-
-        //    }
-        //    catch(Exception)
-        //    {
-        //        return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
-               
-        //    }
-
-            
-        //}
-
-        //[HttpGet("{idItem}")]
-        //public async Task<IActionResult> GetPrescription([FromRoute] int idItem)
-        //{
-        //    try
-        //    {
-        //        var item =await _repository.GetItemAsync(idItem);
-
-        //        if (item != null)
-        //            return Ok(item);
-        //        else
-        //            return NotFound("Nie znaleziono przedmiotu");
-
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
-
-        //    }
-
-        //}
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDTO userDTO)

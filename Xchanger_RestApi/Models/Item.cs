@@ -39,6 +39,9 @@ namespace Xchanger_RestApi.Models
         [Column("Users_id")]
         public int UserId { get; set; }
 
+        [Column("location")]
+        public string Location { get; set; }
+
         [ForeignKey(nameof(CategoryId))]
         [InverseProperty(nameof(Category.Items))]
         public virtual Category Categories { get; set; }
