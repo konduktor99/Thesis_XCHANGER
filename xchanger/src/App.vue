@@ -1,9 +1,9 @@
 <template>
   <div id="app" >
-    <HeaderBar v-bind:loggedIn="true"/>
+    <HeaderBar v-bind:loggedIn="false"/>
     <NavBar register="false"/>
     <main>
-      <router-view/>
+      <router-view :key="$route.fullPath"/>
     </main>
     <FooterBar/>
   </div>
@@ -30,6 +30,8 @@ export default {
 };
 
 </script>
+
+
 
 <style>
 #app {

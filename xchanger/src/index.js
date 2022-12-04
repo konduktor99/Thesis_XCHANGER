@@ -6,6 +6,7 @@ import ItemDetails from './components/ItemDetails.vue'
 import NotFound from './components/NotFound.vue'
 import UserItemTiles from './components/UserItemTiles.vue'
 import ItemForm from './components/ItemForm.vue'
+import EditItemForm from './components/EditItemForm.vue'
 
 
 const routes = [
@@ -29,14 +30,30 @@ const routes = [
   {
     path: '/items',
     component: ItemTiles,
+    props: route => ({  user: route.query.user,  category: route.query.category}),
     children: [
 
       { path: 'login', component: LogInForm },
     ],
   },
+//{
+  // path: '/items/user/:login',
+  //   component: ItemTiles,
+  //   props: true,
+  //   // children: [
+
+  //   //   { path: 'login', component: LogInForm },
+  //   // ],
+  // },
   {
     path: '/items/:id',
     component: ItemDetails,
+    props: true
+    //props: {imageUrl: require("../assets/images/kask.png")}
+  },
+  {
+    path: '/my-profile/edit-item/:id',
+    component: EditItemForm,
     props: true
     //props: {imageUrl: require("../assets/images/kask.png")}
   },

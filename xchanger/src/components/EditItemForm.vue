@@ -4,51 +4,47 @@
 
       <form class="item-form" name="item-form" @submit="validateForm">
 
-        <h2 class="form-header"> Dodaj ogłoszenie</h2>
+        <h2 class="form-header"> Edytuj ogłoszenie</h2>
 
         <div class="form-group">
           <label for="upload-pics">Zdjęcia</label>
-          <div class="upload-pics-box">
+          <!-- <div class="upload-pics-box">
             <input type="file" id="upload-pics" multiple accept="image/png, image/jpeg" data-buttonText="Dodaj" @change="onPicsSelected"> 
           </div>
-          <span class="inputAlert" visible="false"></span> 
+          <span class="inputAlert" visible="false"></span>  -->
 
           <output id="result-pics" />
         </div>
           <div class="form-group">
             <label for="title">Tytuł</label>
-            <input type="text" class="form-control" id="title" name="title" v-model="title" @change="validateTitle"  placeholder="np. rower">
+            <input type="text" class="form-control" id="title" name="title" v-model="item.title" @change="validateTitle" placeholder="np. rower">
             <span class="inputAlert" id="title-alert" >{{titleError}}</span> 
           </div>
 
           <div class="form-group">
-           
-            <!-- <vue-google-autocomplete id="map" classname="form-control" placeholder="Start typing" v-on:placechanged="getAddressData"> -->
-            <!-- @place_changed="setPlace" -->
-            <!-- </vue-google-autocomplete> -->
+    
               <label for="address">Lokalizacja</label>
-             <GMapAutocomplete class="form-control" id="autocomplete-loc" placeholder="Wybierz lokalizację przedmiotu" :options="autocompleteOptions" @change="locationChanged"  @place_changed="validateLocation"  >           
-                    
+             <GMapAutocomplete class="form-control" id="autocomplete-loc" placeholder="Wybierz lokalizację przedmiotu" :options="autocompleteOptions" :value="item.location"   @change="locationChanged"  @place_changed="validateLocation"  >  
             </GMapAutocomplete>
           <span class="inputAlert" id="location-alert">{{locationError}}</span> 
           </div>
           <div class="form-group">
             <label for="desc">Opis</label>
-            <textarea class="form-control" id="desc" rows="5"  name="description" v-model="description" @change="validateDesc" ></textarea>
+            <textarea class="form-control" id="desc" rows="5"  name="description" v-model="item.desc" @change="validateDesc" ></textarea>
             <span class="inputAlert" id="desc-alert">{{descriptionError}}</span> 
           </div>
         
           <div class="form-group">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="stan" id="uzywanyRadio" value="używany" checked>
-              <label  for="uzywanyRadio">
-                Używany
+              <input class="form-check-input" type="radio" name="stan" id="newRadio" :value="true" v-model="item.isNew" :checked="item.isNew" >
+              <label  for="newRadio">
+                Nowy
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="stan" id="nowyRadio" value="nowy">
-              <label  for="nowyRadio">
-                Nowy
+              <input class="form-check-input" type="radio" name="stan" id="usedRadio" :value="false"  v-model="item.isNew" :checked="item.isNew"  >
+              <label  for="usedRadio">
+                Używany {{item}}
               </label>
             </div>
             
@@ -93,29 +89,36 @@ function checkTextLengthRange(value,min,max) {
 
  
 export default {
-    name: 'ItemForm',
-
-
+    name: 'EditItemForm',
+    props: {
+    titleProp: String,
+    desc: String,
+    id:Number,
+    user: String,
     
+}   ,
+
   
 
     data()
     {
         return {
-            title:null,
+            item: this.$route.query,
+            
             titleError:null,
             // email:null,
             // emailError:null,
             location:null,
             locationError:null,
-            placeSelected:false,
+            placeSelected:true,
             description:null,
             descriptionError:null,
             autocompleteOptions : {
                 types: ['(cities)'],
                 componentRestrictions: {country: "pl"}
               },
-            tooManyPics:false
+            tooManyPics:false,
+           
         }
     },
 
@@ -123,45 +126,34 @@ export default {
 
      methods: {
 
-       onPicsSelected(e){
+    //    onPicsSelected(e){
 
-         if (window.File && window.FileReader && window.FileList && window.Blob) { 
-              const files = e.target.files; 
-            if(files.length>6){
-              alert("Można wybrać maksymalnie 6 zdjęć");
-              this.tooManyPics=true;
-              return
-            }
-              const output = document.querySelector("#result-pics");
-              output.innerHTML="";
-              for (let i = 0; i < files.length; i++) { 
-                  if (!files[i].type.match("image")) continue; 
-                  const picReader = new FileReader(); 
-                  picReader.addEventListener("load", function (event) { 
-                    const picFile = event.target;
-                    const img = document.createElement("img");
-                    img.classList.add("uploaded-pic");
-                    img.src = picFile.result;
-                    //const img = document.createElement("div");
-                    //div.innerHTML = `<img class="uploaded-pic" src="${picFile.result}" title="${picFile.name}"/>`;
-                    output.appendChild(img);
-                  });
-                  picReader.readAsDataURL(files[i]); 
-              }
-            } else {
-              alert("Przeglądarka nie wspiera File API");
-            }
+    //      if (window.File && window.FileReader && window.FileList && window.Blob) { 
+    //           const files = e.target.files; 
+    //         if(files.length>6){
+    //           alert("Można wybrać maksymalnie 6 zdjęć");
+    //           this.tooManyPics=true;
+    //           return
+    //         }
+    //           const output = document.querySelector("#result-pics");
+    //           output.innerHTML="";
+    //           for (let i = 0; i < files.length; i++) { 
+    //               if (!files[i].type.match("image")) continue; 
+    //               const picReader = new FileReader(); 
+    //               picReader.addEventListener("load", function (event) { 
+    //                 const picFile = event.target;
+    //                 const img = document.createElement("img");
+    //                 img.classList.add("uploaded-pic");
+    //                 img.src = picFile.result;
+    //                 output.appendChild(img);
+    //               });
+    //               picReader.readAsDataURL(files[i]); 
+    //           }
+    //         } else {
+    //           alert("Przeglądarka nie wspiera File API");
+    //         }
 
-       },
-      
-
-        // validateForm(e) {
-        //     const validLogin = this.validateLogin();
-        //     //const validEmail = this.validateEmail();
-        //     const validPassword = this.validatePassword();
-        //     if(!(validLogin && validPassword ))
-        //         e.preventDefault()
-        // }
+    //    },
 
 
          validateTitle() {
@@ -172,14 +164,14 @@ export default {
             input.classList.add("correct-input");
             
         
-            if (!this.title) {
+            if (!this.item.title) {
                 errorText = "Podaj tytuł ogłoszenia."
                 this.titleError = errorText
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 return false
             }
-            if (checkDanger(this.title))
+            if (checkDanger(this.item.title))
             {
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
@@ -187,7 +179,7 @@ export default {
                 this.titleError = errorText
                 return false;
             } 
-            if (!checkTextLengthRange(this.title,5,30)) {
+            if (!checkTextLengthRange(this.item.title,5,30)) {
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 errorText = "Tytuł powinien zawierać od 5 do 30 znaków."
@@ -205,14 +197,14 @@ export default {
             input.classList.remove("error-input");
             input.classList.add("correct-input");
 
-            if (!this.description){
+            if (!this.item.description){
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 errorText = "Podaj opis ogłoszenia."
                 this.descriptionError = errorText
                 return false;
             }
-            if (checkDanger(this.description))
+            if (checkDanger(this.item.description))
             {
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
@@ -220,7 +212,7 @@ export default {
                 this.descriptionError = errorText
                 return false;
             } 
-            if (!checkTextLengthRange(this.description,100,850)) {
+            if (!checkTextLengthRange(this.item.description,100,850)) {
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 errorText = "Opis powinien zawierać od 100 do 850 znaków."
@@ -245,25 +237,14 @@ export default {
 
             validateLocation() {
               
-              this.location = document.getElementById("autocomplete-loc").value
-              console.log(this.location);
+              this.item.location = document.getElementById("autocomplete-loc").value
+              console.log(this.item.location);
               this.placeSelected = true;
               
               this.locationError=""
               var input = document.getElementById("autocomplete-loc");
               input.classList.remove("error-input");
               input.classList.add("correct-input");
-        
-           
-              // if (checkDanger(this.location))
-              // {
-              //     input.classList.remove("correct-input");
-              //     input.classList.add("error-input");
-              //     errorText = "Lokalizacja zawiera niebezpieczne znaki."
-              //     this.locationError = errorText
-              //     this.placeSelected = false;
-              // } 
-    
             
         },
        
@@ -274,7 +255,6 @@ export default {
            if(!this.placeSelected)
               this.locationError = "Wybierz lokalizacje z listy."
             
-
             if(!(validTitle && validDesc && this.placeSelected))
                 e.preventDefault()
         }

@@ -102,7 +102,6 @@ export default {
     data()
     {
         return {
-            error:[],
             title:null,
             titleError:null,
             // email:null,
@@ -176,7 +175,6 @@ export default {
             if (!this.title) {
                 errorText = "Podaj tytuł ogłoszenia."
                 this.titleError = errorText
-                this.error.push(errorText)
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 return false
@@ -187,7 +185,6 @@ export default {
                 input.classList.add("error-input");
                 errorText = "Tytuł zawiera niebezpieczne znaki."
                 this.titleError = errorText
-                this.error.push(errorText)
                 return false;
             } 
             if (!checkTextLengthRange(this.title,5,30)) {
@@ -195,7 +192,6 @@ export default {
                 input.classList.add("error-input");
                 errorText = "Tytuł powinien zawierać od 5 do 30 znaków."
                 this.titleError = errorText
-                this.error.push(errorText)
                 return false;
             }
             
@@ -214,7 +210,6 @@ export default {
                 input.classList.add("error-input");
                 errorText = "Podaj opis ogłoszenia."
                 this.descriptionError = errorText
-                this.error.push(errorText)
                 return false;
             }
             if (checkDanger(this.description))
@@ -223,7 +218,6 @@ export default {
                 input.classList.add("error-input");
                 errorText = "Opis zwiera niebezpieczne znaki."
                 this.descriptionError = errorText
-                this.error.push(errorText)
                 return false;
             } 
             if (!checkTextLengthRange(this.description,100,850)) {
@@ -231,7 +225,6 @@ export default {
                 input.classList.add("error-input");
                 errorText = "Opis powinien zawierać od 100 do 850 znaków."
                 this.descriptionError = errorText
-                this.error.push(errorText)
                 return false;
                 }    
                 

@@ -6,6 +6,10 @@ import "@fortawesome/fontawesome-free/js/all.js";
 import Router from './index.js'
 import  "vue-google-autocomplete";
 import VueGoogleMaps from '@fawmi/vue-google-maps'
+// import urls from 'urls.js'
+import axios from 'axios'
+
+axios.defaults.baseURL = 'https://localhost:44320/'
 
 
 // createApp(App).use(Router).mount('#app')
@@ -17,4 +21,5 @@ createApp(App)
     }
   })
   .use(Router)
+
   .mount("#app");

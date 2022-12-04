@@ -1,7 +1,7 @@
 <template>
 
 
-<div id="not-found"> 
+<div id="error"> 
 
  <h1>Nie znaleziono zasobu w "{{this.$route.path}}" :( </h1>
 
@@ -16,17 +16,9 @@ export default {
 }
 </script>
 <style >
-#not-found{
 
-text-align: center;
 
-margin: 10%;
-}
 
-#not-found h1{
-    font-weight: bolder;
-    color:rgb(147, 147, 186);
-}
 </style>
 
 

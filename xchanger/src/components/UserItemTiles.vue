@@ -38,18 +38,24 @@ export default {
           id: 1,
           user: "gipsu99",
           title: "Kask bell",
+          location: "Warszawa",
+          isNew: true,
           desc: "Some quick example text to build on the Kask Bell and make up the bulk of the card's content."
         },
         {
           id: 2,
           user: "_konduktor_",
           title: "Kask",
+          location: "Gdańsk",
+          isNew: false,
           desc: "blablablabalbalabalblb ablblblbabl bbbbjfilenlcekcddcewdukjwrhurwkjh."
         },
         {
           id: 3,
           user: "ochrzan",
           title: "Nie Kask",
+          location: "Bobrowiec",
+          isNew: true,
           desc: "XDDDDDDDDDDDDDDDDDDDD."
         }
       ]

@@ -1,6 +1,6 @@
 <template>
 
-<div class ="main-item">
+<div class ="main-item" v-if="item && !error">
 
     <div class="slideshow" >
         <!-- <img  src="../assets/images/kask3.png" alt="Card image cap"/> -->
@@ -10,27 +10,31 @@
     </div>
 
     <div class="details-item" >
-      <h3>Kask Bell</h3>
-      <h3>{{id}}</h3>
-      <h4>_konduktor_</h4>
-      <h5>518557138</h5>
-      <a href="">Więcej od tego ogłoszeniodawcy <i class="fa fa-chevron-right" ></i></a><br/><br/>
+      <h3>{{item.title}}</h3>
+      <h4>{{item.user.login}}</h4>
+      <h5>{{item.location}}</h5>
+      <h5>{{item.user.phoneNumber}}</h5>
+      <router-link :to="{ path: `/items`, query: {user:item.user.login}}">Więcej od tego ogłoszeniodawcy <i class="fa fa-chevron-right" ></i></router-link><br/><br/>
       <button type="button" class="btn btn-success btn-block">Zaproponuj wymianę <i class="fa fa-exchange" aria-hidden="true"></i></button>
 
     </div>
 
     <div class="description-item" >
       <h4>Opis</h4>
-      <a >Kask Bell Super 3r. Odpinana szczęka. System ochrony MIPS, chroniący mózg przy uderzeniu. Kask mało używany, praktycznie jak nowy. Dla zdecydowanego kupującego możliwy dowóz na terenie Wałbrzycha i okolic. W razie pytań proszę dzwonić. Zapraszam.
-        Platforma do wymiany wszelkiego rodzaju przedmiotów działająca zgodnie z postawą "anti-waste", sprzyjająca rozwojowi gospodarki o obiegu zamkniętym, gdzię jak najmniej artykułów codziennego użytku kończy przedwcześnie swój żywot na wysypisku lub zapomniane, na strychu. Dzięki naszemu portalowi sprawisz, że twoje rzeczy trafią do nowego właściciela, bez żadnych pośredników, a co za tym idzie bez generowania zbędnych kosztów dla Ciebie oraz planety, przy jednoczesnym zapewnieniu, że otrzymasz w zamian to czego potrzebujesz.
-      </a>
+      <a >{{item.description}}</a>
+
     <!-- <img src="../assets/images/kask3.png" /> -->
     </div>
+</div>
+<div v-else-if="!items && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
+<div v-else id="error" style="text-align: center;"> 
+ <h1 style="font-weight: bolder;color:rgb(147, 147, 186);">{{error}}</h1>
 </div>
 </template>
 
 <script>
 
+import axios from 'axios'
 
 export default {
   name: 'ItemDetails',
@@ -45,13 +49,41 @@ export default {
     data(){
       return {
 
+           
            id: this.$route.params.id, 
            images : [require("../assets/images/kask.png"),require("../assets/images/kask2.png"),require("../assets/images/kask3.png")],
-           imagePath: null
+           imagePath: null,
+           item: undefined,
+           error: undefined
       }
     },
 
   methods:{
+
+    
+    getItem(id){
+      axios.get(`Items/${id}`)
+      .then((response)=>{
+        this.item = response.data;
+        
+      }).catch(error => {
+       
+       let mess;
+       switch (error.response.status) {
+          case 400:
+            mess = "Nieprawidłowe rządanie"
+            break;
+          case 404:
+            mess = error.response.data
+            break;
+          case 500:
+            mess = "Wystąpił błąd wewnętrzny serwera"
+            break;
+        }
+          this.error = `${error.response.status} ${mess} :(`
+       
+        });
+    },
 
       
     changeImgForward(){
@@ -78,6 +110,9 @@ export default {
   beforeMount(){
     this.imagePath =  this.images[0];
  },
+  mounted:function(){
+      this.getItem(this.id);
+  }
 
 
   

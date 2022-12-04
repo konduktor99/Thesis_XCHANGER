@@ -17,6 +17,12 @@
           </div>
 
           <div class="form-group">
+            <label for="phone">Numer telefonu</label>
+            <input type="tel" class="form-control" id="phone"   placeholder="format: np. 600500400" maxlength=30 v-model="phone" @change="validatePhone">
+            <span class="inputAlert" id="phone-alert">{{phoneError}}</span> 
+          </div>
+
+          <div class="form-group">
             <label for="password">Hasło</label>
             <input type="password" class="form-control" id="password"  placeholder="min. 8 znaków w tym cyfra i znak specjalny" maxlength=30 v-model="password" @change="validatePassword">
             <span class="inputAlert" id="password-alert">{{passwordError}}</span> 
@@ -76,7 +82,9 @@ export default {
             password:null,
             passwordError:null,
             passwordConf:null,
-            passConfError:null
+            passConfError:null,
+            phone:null,
+            phoneError:null
         }
     },
 
@@ -116,6 +124,26 @@ export default {
             return true
         
         },
+        validatePhone(){
+            var errorText=""
+            this.phoneError=""
+            var regexPhone = /^[0-9]{9}$/;
+            var input = document.getElementById("phone");
+            input.classList.remove("error-input");
+            input.classList.add("correct-input");
+        
+
+            if (!String(this.phone).match(regexPhone))
+            {
+                errorText = "Wprowadzono nieprawidłowy numer telefonu."
+                this.phoneError = errorText
+                input.classList.remove("correct-input");
+                input.classList.add("error-input");
+                return false
+            }
+            return true
+        
+        },
         validateEmail() {
             var errorText=""
             this.emailError=""
@@ -148,6 +176,14 @@ export default {
                 input.classList.add("error-input");
                 return false
             }
+              if (!checkTextLengthRange(this.email,5,30)) {
+                errorText = "Adres e-mail musi zawierać od 7 do 30 znaków."
+                this.loginError = errorText
+                this.error.push(errorText)
+                input.classList.remove("correct-input");
+                input.classList.add("error-input");
+                return false
+            } 
             
 
             return true
@@ -240,10 +276,11 @@ export default {
         validateForm(e) {
             const validLogin = this.validateLogin();
             const validEmail = this.validateEmail();
+            const validPhone = this.validatePhone();
             const validPassword = this.validatePassword();
             const validConfirmPass = this.validateConfirmPass();
 
-            if(!(validLogin && validEmail && validPassword && validConfirmPass))
+            if(!(validLogin && validEmail && validPassword && validConfirmPass && validPhone))
                 e.preventDefault()
         }
     },

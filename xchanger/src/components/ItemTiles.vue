@@ -1,56 +1,62 @@
 <template>
-<div>
+<div v-if="items && !error">
   <transition name="fade">
     <router-view/>
   </transition>
 
 <div class="main-main">
- 
 
   <router-link v-for="item in items" :key="item" :to=" `/items/${item.id}`" style="text-decoration: none; color: inherit; ">
-    <ItemTile  :title="item.title" :desc=item.desc v-bind:modify="false"/>
+    <ItemTile  v-bind="item" v-bind:modify="false"/>
   </router-link>
 
 </div>
 </div>
-
-
+<div v-else-if="!items && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
+<div v-else id="error"> 
+ <h1>{{error}}</h1>
+</div>
 </template>
 
 <script>
 
 import ItemTile from './ItemTile.vue'
-
+import axios from 'axios'
 export default {
   name: 'ItemTiles',
+  props: {
+    user: String,
+    category: String   
+  },
   components: {
     ItemTile
   },
   data: () => {
     return{
-      items: [
-        {
-          id: 1,
-          user: "gipsu99",
-          title: "Kask bell",
-          desc: "Some quick example text to build on the Kask Bell and make up the bulk of the card's content."
-        },
-        {
-          id: 2,
-          user: "_konduktor_",
-          title: "Kask",
-          desc: "blablablabalbalabalblb ablblblbabl bbbbjfilenlcekcddcewdukjwrhurwkjh."
-        },
-        {
-          id: 3,
-          user: "ochrzan",
-          title: "Nie Kask",
-          desc: "XDDDDDDDDDDDDDDDDDDDD."
-        }
-      ]
+      items: undefined,
+      error: undefined
     }
+  },
+    methods:{
+      getItems(){
+        let pathPart = ""
+        if(this.user)
+        pathPart = `user/${this.user}`
+      
+
+        axios.get(`Items/${pathPart}`)
+        .then((response)=>{
+          this.items = response.data;
+        }).catch(error => {
+          this.error = `${error.response.status} ${error.response.data} :(`
+        });
+      }
+    },
+    mounted:function(){
+      this.getItems();
   }
 }
+
 </script>
 <style>
 .fade-enter-from,
