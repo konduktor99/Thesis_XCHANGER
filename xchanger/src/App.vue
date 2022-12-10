@@ -1,6 +1,6 @@
 <template>
   <div id="app" >
-    <HeaderBar v-bind:loggedIn="false"/>
+    <HeaderBar v-bind:loggedIn="true"/>
     <NavBar register="false"/>
     <main>
       <router-view :key="$route.fullPath"/>
@@ -29,6 +29,9 @@ export default {
    
 };
 
+
+
+
 </script>
 
 
@@ -36,12 +39,14 @@ export default {
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Optima,Segoe,Segoe UI,Candara,Calibri,Arial,sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
   
   color: #2c3e50;
   background: rgb(250, 250, 250);
+   
 }
 
 @import './assets/style/style.css'

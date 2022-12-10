@@ -14,7 +14,7 @@
           <div class="form-group">
             <label for="password">Hasło</label>
             <input type="password" class="form-control" id="password" maxlength=30 v-model="password" @change="validatePassword">
-            <span class="inputAlert" id="password-alert">{{emailError}}</span> 
+            <span class="inputAlert" id="password-alert">{{passwordError}}</span> 
           </div>
         <br>
 
@@ -102,42 +102,42 @@ export default {
         return true
         
         },
-        validateEmail() {
-        var errorText=""
-        this.emailError=""
-        var regexEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-        var input = document.getElementById("email");
-        input.classList.remove("error-input");
-        input.classList.add("correct-input");
+        // validateEmail() {
+        // var errorText=""
+        // this.emailError=""
+        // var regexEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        // var input = document.getElementById("email");
+        // input.classList.remove("error-input");
+        // input.classList.add("correct-input");
 
-        if (!this.email) {
-            errorText = "Podaj adres email."
-            this.emailError = errorText
-            this.error.push(errorText)
-            input.classList.remove("correct-input");
-            input.classList.add("error-input");
-            return false
-        }
-        if (checkDanger(this.email))
-        {
-            errorText = "Adres email zawiera niebezpieczne znaki."
-            this.emailError = errorText
-            this.error.push(errorText)
-            return false
-        } 
-        if (!String(this.email).toLowerCase().match(regexEmail))
-        {
-            errorText = "Wprowadzono nieprawidłowy adres e-mail."
-            this.emailError = errorText
-            this.error.push(errorText)
-            input.classList.remove("correct-input");
-            input.classList.add("error-input");
-            return false
-        } 
+        // if (!this.email) {
+        //     errorText = "Podaj adres email."
+        //     this.emailError = errorText
+        //     this.error.push(errorText)
+        //     input.classList.remove("correct-input");
+        //     input.classList.add("error-input");
+        //     return false
+        // }
+        // if (checkDanger(this.email))
+        // {
+        //     errorText = "Adres email zawiera niebezpieczne znaki."
+        //     this.emailError = errorText
+        //     this.error.push(errorText)
+        //     return false
+        // } 
+        // if (!String(this.email).toLowerCase().match(regexEmail))
+        // {
+        //     errorText = "Wprowadzono nieprawidłowy adres e-mail."
+        //     this.emailError = errorText
+        //     this.error.push(errorText)
+        //     input.classList.remove("correct-input");
+        //     input.classList.add("error-input");
+        //     return false
+        // } 
         
 
-        return true
-        },
+        // return true
+        // },
          validatePassword() {
             var errorText=""
             this.passwordError=""

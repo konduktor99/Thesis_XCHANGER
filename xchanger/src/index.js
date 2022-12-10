@@ -4,8 +4,8 @@ import LogInForm from './components/LogInForm.vue'
 import SignInForm from './components/SignInForm.vue'
 import ItemDetails from './components/ItemDetails.vue'
 import NotFound from './components/NotFound.vue'
-import UserItemTiles from './components/UserItemTiles.vue'
-import ItemForm from './components/ItemForm.vue'
+// import UserItemTiles from './components/UserItemTiles.vue'
+// import ItemForm from './components/ItemForm.vue'
 import EditItemForm from './components/EditItemForm.vue'
 
 
@@ -55,16 +55,20 @@ const routes = [
     path: '/my-profile/edit-item/:id',
     component: EditItemForm,
     props: true
+
     //props: {imageUrl: require("../assets/images/kask.png")}
   },
   {
     path: '/my-profile',
-    component: UserItemTiles,
+    component: ItemTiles,
+
+    props: route => ({  user: route.query.user,  category: route.query.category,  userAccess: true}),
     //props: {imageUrl: require("../assets/images/kask.png")}
   },
   {
     path: '/my-profile/add-item',
-    component: ItemForm,
+    component: EditItemForm,
+    props: { create: true},
     //props: {imageUrl: require("../assets/images/kask.png")}
   },
 

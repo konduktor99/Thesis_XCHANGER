@@ -9,6 +9,7 @@ import VueGoogleMaps from '@fawmi/vue-google-maps'
 // import urls from 'urls.js'
 import axios from 'axios'
 
+ //axios.defaults.baseURL = 'https://192.168.1.14:44320/'
 axios.defaults.baseURL = 'https://localhost:44320/'
 
 

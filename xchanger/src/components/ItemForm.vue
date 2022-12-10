@@ -102,6 +102,9 @@ export default {
     data()
     {
         return {
+
+            item: this.$route.query,
+            
             title:null,
             titleError:null,
             // email:null,

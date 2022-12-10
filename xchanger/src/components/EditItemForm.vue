@@ -2,16 +2,17 @@
 
 <div class="main-item-form">
 
-      <form class="item-form" name="item-form" @submit="validateForm">
+      <form class="item-form" name="item-form" @submit.prevent="submit">
 
-        <h2 class="form-header"> Edytuj ogłoszenie</h2>
+        <h2 v-if="create" class="form-header"> Dodaj ogłoszenie</h2>
+        <h2 v-else class="form-header"> Edytuj ogłoszenie</h2>
 
-        <div class="form-group">
+        <div  class="form-group">
           <label for="upload-pics">Zdjęcia</label>
-          <!-- <div class="upload-pics-box">
-            <input type="file" id="upload-pics" multiple accept="image/png, image/jpeg" data-buttonText="Dodaj" @change="onPicsSelected"> 
+          <div class="upload-pics-box">
+            <input type="file" id="upload-pics" multiple accept="image/png, image/jpeg" data-buttonText="Dodaj" @change="onImgsSelected"> 
           </div>
-          <span class="inputAlert" visible="false"></span>  -->
+          <b v-if="rozmiarMB" :class="sizeSum<30000000? 'good-size-label':'exceeded-size-label'" >{{`${rozmiarMB} / 28 MB`}}</b> 
 
           <output id="result-pics" />
         </div>
@@ -30,19 +31,20 @@
           </div>
           <div class="form-group">
             <label for="desc">Opis</label>
-            <textarea class="form-control" id="desc" rows="5"  name="description" v-model="item.desc" @change="validateDesc" ></textarea>
+            <textarea class="form-control" id="desc" rows="5"  name="description" v-model="item.description" @change="validateDesc" ></textarea>
             <span class="inputAlert" id="desc-alert">{{descriptionError}}</span> 
           </div>
         
           <div class="form-group">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="stan" id="newRadio" :value="true" v-model="item.isNew" :checked="item.isNew" >
+              <input v-if="create" class="form-check-input" type="radio" name="stan" id="newRadio" :value="true" v-model="item.isNew" checked >
+              <input v-else class="form-check-input" type="radio" name="stan" id="newRadio" :value="true" v-model="item.isNew" :checked="item.isNew === 'true'" >
               <label  for="newRadio">
                 Nowy
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="stan" id="usedRadio" :value="false"  v-model="item.isNew" :checked="item.isNew"  >
+              <input class="form-check-input" type="radio" name="stan" id="usedRadio" :value="false"  v-model="item.isNew" :checked="item.isNew === 'false'"  >
               <label  for="usedRadio">
                 Używany {{item}}
               </label>
@@ -50,8 +52,12 @@
             
           </div>
 
-          <button type="submit" class="form-button-submit">Dodaj  <i class="fa fa-plus"></i></button>
-          <button type="button" class="form-button-cancel">Anuluj <i class="fa fa-times"></i></button>
+          <button v-if="create" type="submit" class="form-button-submit">Dodaj  <i class="fa fa-plus"></i></button>
+          <button v-else type="submit" class="form-button-submit">Edytuj  <i class="fa fa-plus"></i></button>
+          <router-link :to="returnPrevious">
+            <button type="button" class="form-button-cancel">Anuluj <i class="fa fa-times"></i></button>
+          </router-link>
+         
       
       </form>
       
@@ -60,10 +66,8 @@
 </template>
 
 <script>
+import axios from 'axios'
 
-var i = 1
-i = false
-console.log(i)
 function checkDanger(value) {
     
     var dangerous = /.*(?=.*[%/)(+><"'-]).*/;
@@ -95,6 +99,8 @@ export default {
     desc: String,
     id:Number,
     user: String,
+    isNew: Boolean,
+    create: Boolean,
     
 }   ,
 
@@ -103,9 +109,11 @@ export default {
     data()
     {
         return {
+           // id: this.$route.params.id, 
             item: this.$route.query,
             
             titleError:null,
+            filesError:null,
             // email:null,
             // emailError:null,
             location:null,
@@ -117,43 +125,160 @@ export default {
                 types: ['(cities)'],
                 componentRestrictions: {country: "pl"}
               },
-            tooManyPics:false,
+            tooBigPics:false,
+            files: [],
+            returnPrevious: !this.$router.options.history.state.back ? '/items' : this.$router.options.history.state.back,
+            rozmiarMB: null,
+            sizeSum:null
+
            
         }
     },
 
 
 
+
      methods: {
 
-    //    onPicsSelected(e){
 
-    //      if (window.File && window.FileReader && window.FileList && window.Blob) { 
-    //           const files = e.target.files; 
-    //         if(files.length>6){
-    //           alert("Można wybrać maksymalnie 6 zdjęć");
-    //           this.tooManyPics=true;
-    //           return
-    //         }
-    //           const output = document.querySelector("#result-pics");
-    //           output.innerHTML="";
-    //           for (let i = 0; i < files.length; i++) { 
-    //               if (!files[i].type.match("image")) continue; 
-    //               const picReader = new FileReader(); 
-    //               picReader.addEventListener("load", function (event) { 
-    //                 const picFile = event.target;
-    //                 const img = document.createElement("img");
-    //                 img.classList.add("uploaded-pic");
-    //                 img.src = picFile.result;
-    //                 output.appendChild(img);
-    //               });
-    //               picReader.readAsDataURL(files[i]); 
-    //           }
-    //         } else {
-    //           alert("Przeglądarka nie wspiera File API");
-    //         }
+      submit(){
+      this.item.userId = 6;
+      this.item.categoryId =1;
+      if(this.validateForm()){
 
-    //    },
+        var formData = new FormData();
+        for( var key in this.item)
+          formData.append(key,this.item[key]);
+
+       Array.prototype.forEach.call(this.files,file=>{
+        formData.append("files", file);
+        });
+
+         if(this.create){
+
+          axios.post(`Items/CreateItem`, formData)
+          .then(()=>{ 
+           this.$router.push(this.returnPrevious);
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+        });
+        }else{
+          
+          axios.put(`Items/${this.item.id}`,formData)
+          .then(()=>{
+           console.log("SSSSSSSS")
+           this.$router.push(this.returnPrevious);
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+        });
+        }
+         
+
+       
+      }
+       
+      },
+
+      retrieveImages(){
+         axios.get(`Items/images/${this.item.id}`)
+          .then((response)=>{
+           this.files = response.data
+           this.showImages()
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+        });
+      },
+
+       onImgsSelected(e){
+         if (window.File && window.FileReader && window.FileList && window.Blob) { 
+               this.files = e.target.files; 
+
+          this.sizeSum = 0
+          for (let i = 0; i < this.files.length; i++) { 
+            this.sizeSum+= this.files[i].size;
+          }
+          this.rozmiarMB = Math.floor(this.sizeSum / (1024*1024))
+          if(this.sizeSum>30000000){
+              
+            alert(`Zbyt duży rozmiar plików.  aktualnie ${this.rozmiarMB} MB (maks. 28 MB)`);
+            this.tooBigPics=true;
+            return
+          }
+            const output = document.querySelector("#result-pics");
+            output.innerHTML=""
+            for (let i = 0; i < this.files.length; i++) { 
+                if (!this.files[i].type.match("image")) continue; 
+                const picReader = new FileReader(); 
+                picReader.addEventListener("load", function (event) { 
+                  const picFile = event.target;
+                  const img = document.createElement("img");
+                  img.classList.add("uploaded-pic");
+                  img.src = picFile.result;
+                  output.appendChild(img);
+                });
+                picReader.readAsDataURL(this.files[i]); 
+            }
+           
+            } else {
+              alert("Przeglądarka nie wspiera File API");
+            }
+
+       },
+
+       showImages(){
+          const output = document.querySelector("#result-pics");
+          for (let i = 0; i < this.files.length; i++) {  
+                  const img = document.createElement("img");
+                  img.classList.add("uploaded-pic");
+                  img.src = `data:image/jpeg;base64,${this.files[i]}`
+                  output.appendChild(img);     
+          }
+          this.files=[]
+            
+            
+       },
 
 
          validateTitle() {
@@ -179,10 +304,10 @@ export default {
                 this.titleError = errorText
                 return false;
             } 
-            if (!checkTextLengthRange(this.item.title,5,30)) {
+            if (!checkTextLengthRange(this.item.title,5,45)) {
                 input.classList.remove("correct-input");
                 input.classList.add("error-input");
-                errorText = "Tytuł powinien zawierać od 5 do 30 znaków."
+                errorText = "Tytuł powinien zawierać od 5 do 45 znaków."
                 this.titleError = errorText
                 return false;
             }
@@ -238,7 +363,6 @@ export default {
             validateLocation() {
               
               this.item.location = document.getElementById("autocomplete-loc").value
-              console.log(this.item.location);
               this.placeSelected = true;
               
               this.locationError=""
@@ -248,17 +372,27 @@ export default {
             
         },
        
-          validateForm(e) {
+          validateForm() {
             const validTitle = this.validateTitle();
             const validDesc = this.validateDesc();
+            //this.validateLocation();
            
            if(!this.placeSelected)
               this.locationError = "Wybierz lokalizacje z listy."
             
-            if(!(validTitle && validDesc && this.placeSelected))
-                e.preventDefault()
+           
+            return (validTitle && validDesc && !this.tooBigPics)
+               
         }
     },
+
+    mounted:function(){
+      if(!this.create)
+        this.retrieveImages()
+        
+      
+        
+  }
 
 
  };
