@@ -35,6 +35,7 @@ namespace Xchanger_RestApi.Repositories
             user.PhoneNumber = userDTO.PhoneNumber;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.JoinDate = DateTime.Now;
 
 
             await _dbContext.Users.AddAsync(user);

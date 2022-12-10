@@ -59,7 +59,7 @@ namespace Xchanger_RestApi.Controllers
             {
                 return NotFound("Nie znaleziono użytkownika.");
             }
-          
+
 
             if (!VerifyPassword(userDto.Password, user.PasswordHash, user.PasswordSalt))
             {
@@ -163,8 +163,8 @@ namespace Xchanger_RestApi.Controllers
             //user.RefreshTokenExpireTime = newRefreshToken.ExpireTime;
             //user.RefreshTokenCreateTime = newRefreshToken.CreateTime;
             //user.RefreshToken = newRefreshToken.Token;
-            
-            
+
+
         }
 
         //[HttpPut("{idItem}")]
@@ -187,7 +187,26 @@ namespace Xchanger_RestApi.Controllers
 
         //}
 
+        [HttpGet("{login}")]
+        public async Task<IActionResult> GetItemDtoAsync([FromRoute] string login)
+        {
+            try
+            {
+                var user = await _repository.GetUserByUsername(login);
+
+                if (user != null)
+                    return Ok(user);
+                else
+                    return NotFound("Nie znaleziono użytkownika");
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
+
+            }
+
+        }
+
     }
-
-
 }

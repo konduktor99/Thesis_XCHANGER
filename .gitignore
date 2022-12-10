@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+# folder ze zdj przedmiotow
+itemPics/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

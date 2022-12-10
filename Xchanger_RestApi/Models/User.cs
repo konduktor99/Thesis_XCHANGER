@@ -40,6 +40,9 @@ namespace Xchanger_RestApi.Models
         [StringLength(64)]
         public string? RefreshToken { get; set; }
 
+        [Column("join_date")]
+        public DateTime? JoinDate { get; set; }
+
         [Column("refresh_token_expire")]
         public DateTime? RefreshTokenExpireTime { get; set; }
 

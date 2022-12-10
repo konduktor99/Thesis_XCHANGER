@@ -9,6 +9,8 @@ using Xchanger_RestApi.Models;
 using Xchanger_RestApi.DTOs;
 using Xchanger_RestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Xchanger_RestApi.Controllers
 {
@@ -19,10 +21,12 @@ namespace Xchanger_RestApi.Controllers
     {
 
         private readonly IItemsRepository _repository;
+        public static IWebHostEnvironment _env;
 
-        public ItemsController(IItemsRepository repository)
+        public ItemsController(IItemsRepository repository, IWebHostEnvironment env)
         {
             _repository = repository;
+            _env = env;
         }
 
         [HttpGet]
@@ -118,27 +122,61 @@ namespace Xchanger_RestApi.Controllers
             {
                 var item =await _repository.GetItemDtoAsync(idItem);
 
+
+
                 if (item != null)
+                {
+                    item.ImgBytesList = LoadFiles(item.Id);
                     return Ok(item);
+                }
                 else
+                {
+                    
                     return NotFound("Nie znaleziono przedmiotu");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera"+ex);
 
             }
-            catch (Exception)
+
+        }
+
+        [HttpGet("images/{idItem}")]
+        public async Task<IActionResult> GetItemImageAsync([FromRoute] int idItem)
+        {
+            try
             {
-                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
+
+                var imgBytesList = LoadFiles(idItem);
+                return Ok(imgBytesList);
+ 
+
+                return NotFound("Nie znaleziono zdjęć przedmiotu");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera" + ex);
 
             }
 
         }
 
         [HttpPost("CreateItem")]
-        public async Task<IActionResult> CreateItem([FromBody] ItemDTO itemDTO)
+        //[DisableRequestSizeLimit,RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue, ValueLengthLimit = int.MaxValue)]
+        public async Task<IActionResult> CreateItem([FromForm] CreateItemDTO itemDTO)
         {
             try
             {
+                var files = itemDTO.Files;
+                itemDTO.Files = null;
+
                 var item = await _repository.CreateItemAsync(itemDTO);
-              
+
+                saveFiles(files, item.Id);
+
 
                     return Ok(item);
 
@@ -151,14 +189,19 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpPut("{idItem}")]
-        public async Task<IActionResult> UpdateItem([FromBody] ItemDTO itemDTO, [FromRoute] int idItem)
+        public async Task<IActionResult> UpdateItem([FromForm] CreateItemDTO itemDTO, [FromRoute] int idItem)
         {
             try
             {
                 var item = await _repository.UpdateItemAsync(idItem, itemDTO);
 
+
                 if (item == null)
                     return NotFound("Nie znaleziono przedmiotu");
+
+                var files = itemDTO.Files;
+                itemDTO.Files = null;
+                saveFiles(files, item.Id);
 
                 return Ok(item);
 
@@ -185,10 +228,51 @@ namespace Xchanger_RestApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(400, "Nieprawidłowe rządanie" + ex);
-    }
+            }
 
 
-}
+        }
+
+        private void saveFiles(IFormFile[] files, int itemId)
+        {
+            int counter = 1;
+            if (files != null)
+            {
+                var path = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
+                if (Directory.Exists(path))
+                    Directory.Delete(path,true);
+                    Directory.CreateDirectory(path);
+                foreach (var file in files)
+                {
+                    string picName = "\\" + counter + "_itemPic_" + itemId + ".jpg";
+
+                    if (System.IO.File.Exists(path + picName))
+                        System.IO.File.Delete(path + picName);
+
+                    using (FileStream fs = System.IO.File.Create(path + picName))
+                    {
+                        file.CopyTo(fs);
+                        fs.Flush();
+                    }
+                    counter++;
+                }
+
+            }
+
+        }
+        private List<byte[]> LoadFiles(int itemId)
+        {
+
+            var imgBytesList = new List<byte[]>();
+            var itemFolderPath = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
+
+            if (Directory.Exists(itemFolderPath))
+                foreach (string file in Directory.EnumerateFiles(itemFolderPath, "*.jpg"))
+                {
+                    imgBytesList.Add(System.IO.File.ReadAllBytes(file));
+                }
+            return imgBytesList;
+        }
 
 
 

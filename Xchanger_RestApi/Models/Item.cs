@@ -29,8 +29,8 @@ namespace Xchanger_RestApi.Models
         public string Description { get; set; }
         [Column("publication_date", TypeName = "date")]
         public DateTime PublicationDate { get; set; }
-        [Column("new")]
-        public bool New { get; set; }
+        [Column("is_new")]
+        public bool IsNew { get; set; }
         [Column("active")]
         public bool Active { get; set; }
 

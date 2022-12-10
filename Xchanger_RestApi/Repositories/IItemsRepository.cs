@@ -10,10 +10,10 @@ namespace Xchanger_RestApi.Repositories
 
         public Task<IEnumerable<Item>> GetItemsAsync();
         public Task<IEnumerable<Item>> GetActiveItemsAsync(string? category, string? user);
-        public Task<dynamic> GetItemDtoAsync(int idItem);
+        public Task<GetItemDTO> GetItemDtoAsync(int idItem);
         public Task<Item> GetItemAsync(int idItem);
-        public Task<Item> CreateItemAsync(ItemDTO itemDTO);
-        public Task<Item> UpdateItemAsync(int idItem, ItemDTO itemDTO);
+        public Task<Item> CreateItemAsync(CreateItemDTO itemDTO);
+        public Task<Item> UpdateItemAsync(int idItem, CreateItemDTO itemDTO);
         public Task<Item> DeleteItem(int IdItem);
     }
 }

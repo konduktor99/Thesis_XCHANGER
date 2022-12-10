@@ -97,7 +97,7 @@ namespace Xchanger_RestApi.Models
                     .HasColumnName("description")
                     .HasMaxLength(1700);
 
-                entity.Property(e => e.New).HasColumnName("new");
+                entity.Property(e => e.IsNew).HasColumnName("is_new");
 
                 entity.Property(e => e.PublicationDate)
                     .HasColumnName("publication_date")

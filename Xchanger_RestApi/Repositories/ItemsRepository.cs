@@ -37,16 +37,16 @@ namespace Xchanger_RestApi.Repositories
             return await _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user && i.Categories.Name == category).ToListAsync();
         }
 
-        public async Task<dynamic> GetItemDtoAsync(int idItem)
+        public async Task<GetItemDTO> GetItemDtoAsync(int idItem)
         {
-            var item = await _dbContext.Items.Where(i => i.Id == idItem).Select(i => new {
+            var item = await _dbContext.Items.Where(i => i.Id == idItem).Select(i => new GetItemDTO{
 
                 Id = i.Id,
                 Title = i.Title,
                 Description = i.Description,
                 Active = i.Active,
                 PublicationDate = i.PublicationDate,
-                New = i.New,
+                IsNew = i.IsNew,
                 Location = i.Location,
                 Category = new { Id = i.Categories.Id, Name = i.Categories.Name },
                 User = new { Id = i.Users.Id, Login = i.Users.Login, PhoneNumber = i.Users.PhoneNumber }
@@ -66,24 +66,17 @@ namespace Xchanger_RestApi.Repositories
 
 
 
-        public async Task<Item> CreateItemAsync(ItemDTO itemDTO)
+        public async Task<Item> CreateItemAsync(CreateItemDTO itemDTO)
         {
             Item item = new Item();
-            //var user = await _dbContext.Users.Where(u => u.Id == itemDTO.UserId).FirstOrDefaultAsync();
-            //var category = await _dbContext.Categories.Where(u => u.Id == itemDTO.CategoryId).FirstOrDefaultAsync();
-            //user.Items.Add(item);
-            //category.Items.Add(item);
             item.Active = true;
             item.Title = itemDTO.Title;
             item.Description = itemDTO.Description;
             item.UserId = itemDTO.UserId;
             item.CategoryId = itemDTO.CategoryId;
             item.Location = itemDTO.Location;
-            //item.Users = user;
-            //item.Categories = category;
+            item.IsNew = itemDTO.IsNew;
             item.PublicationDate = DateTime.Today;
-            //item.Users.Items.Add(new Item { Title="XD",Description ="XD", UserId = 1, CategoryId = 1, PublicationDate = DateTime.Today});
-            //item.Categories.Items.Add(item);
 
             _dbContext.Entry(item).State = EntityState.Modified;
             //_dbContext.Entry(user).State = EntityState.Modified;
@@ -98,7 +91,7 @@ namespace Xchanger_RestApi.Repositories
             return item;
         }
 
-        public async Task<Item> UpdateItemAsync(int idItem, ItemDTO itemDTO)
+        public async Task<Item> UpdateItemAsync(int idItem, CreateItemDTO itemDTO)
         {
             
             var item = await GetItemAsync(idItem);
@@ -109,6 +102,8 @@ namespace Xchanger_RestApi.Repositories
                 item.Description = itemDTO.Description;
                 item.CategoryId = itemDTO.CategoryId;
                 item.PublicationDate = DateTime.Today;
+                item.IsNew = itemDTO.IsNew;
+                item.Location = itemDTO.Location;
 
 
                 _dbContext.Entry(item).State = EntityState.Modified;
