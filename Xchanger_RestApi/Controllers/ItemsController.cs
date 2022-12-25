@@ -11,6 +11,8 @@ using Xchanger_RestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Xchanger_RestApi.Controllers
 {
@@ -30,15 +32,15 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpGet]
+        
         public async Task<IActionResult> GetActiveItems()
         {
 
             try
             {
                 var items = await _repository.GetActiveItemsAsync(null, null);
-
                 if (items.Count() > 0)
-                    return Ok(items);
+                    return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
                 else
                     return NotFound("Nie znaleziono przedmiotów");
 
@@ -60,7 +62,7 @@ namespace Xchanger_RestApi.Controllers
                 var items = await _repository.GetActiveItemsAsync(category, null);
 
                 if (items.Count() > 0)
-                    return Ok(items);
+                    return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
                 else
                     return NotFound("Nie znaleziono przedmiotów");
 
@@ -81,7 +83,7 @@ namespace Xchanger_RestApi.Controllers
                 var items = await _repository.GetActiveItemsAsync(null, user);
 
                 if (items.Count() > 0)
-                    return Ok(items);
+                    return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
                 else
                     return NotFound("Nie znaleziono przedmiotów");
 
@@ -102,7 +104,7 @@ namespace Xchanger_RestApi.Controllers
                 var items = await _repository.GetActiveItemsAsync(category, user);
 
                 if (items.Count() > 0)
-                    return Ok(items);
+                    return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
                 else
                     return NotFound("Nie znaleziono przedmiotów");
 
@@ -116,6 +118,7 @@ namespace Xchanger_RestApi.Controllers
 
 
         [HttpGet("{idItem}")]
+        [Authorize]
         public async Task<IActionResult> GetItemDtoAsync([FromRoute] int idItem)
         {
             try
@@ -126,7 +129,7 @@ namespace Xchanger_RestApi.Controllers
 
                 if (item != null)
                 {
-                    item.ImgBytesList = LoadFiles(item.Id);
+                    item.ImgBytesList = LoadImages(item.Id);
                     return Ok(item);
                 }
                 else
@@ -149,7 +152,7 @@ namespace Xchanger_RestApi.Controllers
             try
             {
 
-                var imgBytesList = LoadFiles(idItem);
+                var imgBytesList = LoadImages(idItem);
                 return Ok(imgBytesList);
  
 
@@ -170,12 +173,20 @@ namespace Xchanger_RestApi.Controllers
         {
             try
             {
+
+                var jwt = Request.Headers["authorization"].ToString().Substring(7);
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(jwt);
+                var tokenS = jsonToken as JwtSecurityToken;
+                var userId = Int32.Parse(tokenS.Claims.First(claim => claim.Type == "id").Value);
+
+
                 var files = itemDTO.Files;
                 itemDTO.Files = null;
 
-                var item = await _repository.CreateItemAsync(itemDTO);
+                var item = await _repository.CreateItemAsync(itemDTO, userId);
 
-                saveFiles(files, item.Id);
+                saveImages(files, item.Id);
 
 
                     return Ok(item);
@@ -201,7 +212,7 @@ namespace Xchanger_RestApi.Controllers
 
                 var files = itemDTO.Files;
                 itemDTO.Files = null;
-                saveFiles(files, item.Id);
+                saveImages(files, item.Id);
 
                 return Ok(item);
 
@@ -233,7 +244,7 @@ namespace Xchanger_RestApi.Controllers
 
         }
 
-        private void saveFiles(IFormFile[] files, int itemId)
+        private void saveImages(IFormFile[] files, int itemId)
         {
             int counter = 1;
             if (files != null)
@@ -260,7 +271,7 @@ namespace Xchanger_RestApi.Controllers
             }
 
         }
-        private List<byte[]> LoadFiles(int itemId)
+        private List<byte[]> LoadImages(int itemId)
         {
 
             var imgBytesList = new List<byte[]>();
@@ -272,6 +283,24 @@ namespace Xchanger_RestApi.Controllers
                     imgBytesList.Add(System.IO.File.ReadAllBytes(file));
                 }
             return imgBytesList;
+        }
+
+        private byte[] LoadMainImage(int itemId)
+        {
+
+            byte[] imgBytes = null; 
+            var itemFolderPath = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
+
+            string file;
+            if (Directory.Exists(itemFolderPath))
+            {
+                file = Directory.EnumerateFiles(itemFolderPath, "*.jpg").FirstOrDefault();
+                if(file!=null)
+                    imgBytes = System.IO.File.ReadAllBytes(file);
+            }
+                 
+                
+            return imgBytes;
         }
 
 

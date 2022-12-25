@@ -40,6 +40,7 @@ namespace Xchanger_RestApi
             services.AddScoped<IItemsRepository, ItemsRepository>();
             services.AddScoped<IExchangesRepository, ExchangesRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -77,7 +78,8 @@ namespace Xchanger_RestApi
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                   
+                    ClockSkew = TimeSpan.Zero,
+
                     IssuerSigningKey = new SymmetricSecurityKey(Key)
                 };
             });
@@ -89,7 +91,9 @@ namespace Xchanger_RestApi
                     {
                         builder.WithOrigins("http://localhost:8080")
                                             .AllowAnyHeader()
-                                            .AllowAnyMethod();
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
+                                            
                     });
             });
         }

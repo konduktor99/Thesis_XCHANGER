@@ -23,18 +23,34 @@ namespace Xchanger_RestApi.Repositories
             return await _dbContext.Items.ToListAsync();
         }
 
-        public async Task<IEnumerable<Item>> GetActiveItemsAsync(string? category, string? user)
+        public async Task<IEnumerable<GetItemsDTO>> GetActiveItemsAsync(string? category, string? user)
         {
+            IQueryable<Item> items;
             if ((category == null || category == "") && (user == null || user == ""))
-                return await _dbContext.Items.Where(i => i.Active == true).ToListAsync();
+                 items = _dbContext.Items.Where(i => i.Active == true);
 
-            if (category == null || category == "")
-                return await _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user).ToListAsync();
+            else if (category == null || category == "")
+                items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user);
 
-            if (user == null || user == "")
-                return await _dbContext.Items.Where(i => i.Active == true && i.Categories.Name == category).ToListAsync();
+            else if (user == null || user == "")
+                items = _dbContext.Items.Where(i => i.Active == true && i.Categories.Name == category);
 
-            return await _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user && i.Categories.Name == category).ToListAsync();
+            else
+             items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user && i.Categories.Name == category);
+
+            return await items.Select(i => new GetItemsDTO
+            {
+
+                Id = i.Id,
+                Title = i.Title,
+                Description = i.Description,
+                Active = i.Active,
+                PublicationDate = i.PublicationDate,
+                IsNew = i.IsNew,
+                Location = i.Location,
+                CategoryId = i.CategoryId
+            }).ToListAsync();
+
         }
 
         public async Task<GetItemDTO> GetItemDtoAsync(int idItem)
@@ -66,13 +82,13 @@ namespace Xchanger_RestApi.Repositories
 
 
 
-        public async Task<Item> CreateItemAsync(CreateItemDTO itemDTO)
+        public async Task<Item> CreateItemAsync(CreateItemDTO itemDTO, int userId)
         {
             Item item = new Item();
             item.Active = true;
             item.Title = itemDTO.Title;
             item.Description = itemDTO.Description;
-            item.UserId = itemDTO.UserId;
+            item.UserId = userId;
             item.CategoryId = itemDTO.CategoryId;
             item.Location = itemDTO.Location;
             item.IsNew = itemDTO.IsNew;
@@ -86,7 +102,7 @@ namespace Xchanger_RestApi.Repositories
             await _dbContext.SaveChangesAsync();
 
 
-            var user2 = await _dbContext.Users.Where(u => u.Id == itemDTO.UserId).FirstOrDefaultAsync();
+            var user2 = await _dbContext.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
             return item;
         }

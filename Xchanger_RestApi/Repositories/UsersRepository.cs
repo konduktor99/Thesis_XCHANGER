@@ -71,10 +71,21 @@ namespace Xchanger_RestApi.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == login);
         }
 
+        public async Task<User> GetUserByRefreshToken(string refreshToken)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
         public async Task<User> GetUserAsync(int idUser)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(i => i.Id == idUser);
             return user;
+        }
+
+        public async Task<bool> CheckUserExistsAsync(string login)
+        {
+            return await _dbContext.Users.AnyAsync(i => i.Login == login);
+            
         }
 
         public async Task SetUserRefreshTokenAsync(string userLogin, DateTime expireTime, DateTime createTime, string token)

@@ -30,16 +30,24 @@ namespace Xchanger_RestApi.Controllers
         }
 
 
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDTO userDTO)
         {
-            var user = new User();
+            if (await _repository.CheckUserExistsAsync(userDTO.Login))
+                return Conflict("Użytkownik o takim loginie już istnieje");
+
+                var user = new User();
             try
             {
                 user = await _repository.RegisterUserAsync(userDTO);
 
 
-                return Ok(user);
+                var jwt = GenerateToken(user);
+
+                var refreshToken = GenerateRefreshToken();
+                await SetRefreshToken(refreshToken, user.Login);
+
+                return Ok(jwt);
 
             }
             catch (Exception ex)
@@ -49,21 +57,16 @@ namespace Xchanger_RestApi.Controllers
 
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(UserLoginDTO userDto)
         {
 
             var user = await _repository.GetUserByUsername(userDto.Login);
 
-            if (user == null)
-            {
-                return NotFound("Nie znaleziono użytkownika.");
-            }
 
-
-            if (!VerifyPassword(userDto.Password, user.PasswordHash, user.PasswordSalt))
+            if (user == null || !VerifyPassword(userDto.Password, user.PasswordHash, user.PasswordSalt))
             {
-                return BadRequest("Nieprawidłowe hasło.");
+                return BadRequest("Nieprawidłowa nazwa użytkownika lub hasło.");
             }
 
             var jwt = GenerateToken(user);
@@ -72,6 +75,29 @@ namespace Xchanger_RestApi.Controllers
             await SetRefreshToken(refreshToken, user.Login);
 
             return Ok(jwt);
+        }
+
+        [HttpPost("Logout")]
+        public async Task<ActionResult<string>> Logout()
+        {
+
+            Response.Cookies.Append("refreshToken", "", new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddMinutes(-1),
+                SameSite = SameSiteMode.None,
+                Secure = true
+
+            });
+
+            Response.Cookies.Append("signed", "", new CookieOptions
+            {
+                Expires = DateTime.Now.AddMinutes(-1),
+                SameSite = SameSiteMode.None,
+                Secure = true
+            });
+
+            return Ok("Wylogowano");
         }
 
         private bool VerifyPassword(string password, byte[] userPasswordHash, byte[] userPasswordSalt)
@@ -87,8 +113,9 @@ namespace Xchanger_RestApi.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Login),
-                new Claim(ClaimTypes.Role, "User")
+                new Claim("name", user.Login),
+                new Claim("id", user.Id.ToString()),
+                new Claim("role", "User")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
@@ -98,7 +125,7 @@ namespace Xchanger_RestApi.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddHours(4),
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials: credentials);
 
             var jwtString = new JwtSecurityTokenHandler().WriteToken(token);
@@ -107,20 +134,21 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken(String login)
+        public async Task<ActionResult<string>> RefreshToken()
         {
 
-            var user = await _repository.GetUserByUsername(login);
 
             var refreshToken = Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+                return Unauthorized("Zaloguj się");
 
-            if (!user.RefreshToken.Equals(refreshToken))
-            {
-                return Unauthorized("Nieprawidłowy Refresh Token.");
-            }
+            var user = await _repository.GetUserByRefreshToken(refreshToken);
+            if (user == null)
+                return Unauthorized("Zaloguj się");
+
             else if (user.RefreshTokenExpireTime < DateTime.Now)
             {
-                return Unauthorized("Token utracił ważność.");
+                return Unauthorized("Zaloguj się");
             }
 
             string token = GenerateToken(user);
@@ -128,6 +156,22 @@ namespace Xchanger_RestApi.Controllers
             await SetRefreshToken(newRefreshToken, user.Login);
 
             return Ok(token);
+        }
+
+        [HttpPost("Current")]
+        public async Task<ActionResult<string>> GetUserByRefreshToken()
+        {
+
+
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+                return NotFound();
+
+            var user = await _repository.GetUserByRefreshToken(refreshToken);
+            if (user == null)
+                return NotFound();
+
+            return Ok(user.Login);
         }
 
         private RefreshToken GenerateRefreshToken()
@@ -143,7 +187,7 @@ namespace Xchanger_RestApi.Controllers
             var refreshToken = new RefreshToken
             {
                 Token = refreshTokenString,
-                ExpireTime = DateTime.Now.AddDays(7),
+                ExpireTime = DateTime.Now.AddMinutes(15),
                 CreateTime = DateTime.Now
             };
 
@@ -152,12 +196,22 @@ namespace Xchanger_RestApi.Controllers
 
         private async Task SetRefreshToken(RefreshToken newRefreshToken, string userLogin)
         {
-            var cookieOpts = new CookieOptions
+
+            Response.Cookies.Append("refreshToken", newRefreshToken.Token, new CookieOptions
             {
                 HttpOnly = true,
-                Expires = newRefreshToken.ExpireTime
-            };
-            Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOpts);
+                Expires = newRefreshToken.ExpireTime,
+                SameSite = SameSiteMode.None,
+                Secure = true
+
+            });
+
+            Response.Cookies.Append("signed", "true", new CookieOptions
+            {
+                Expires = newRefreshToken.ExpireTime,
+                SameSite = SameSiteMode.None,
+                Secure = true
+            });
 
             await _repository.SetUserRefreshTokenAsync(userLogin, newRefreshToken.ExpireTime, newRefreshToken.CreateTime, newRefreshToken.Token);
             //user.RefreshTokenExpireTime = newRefreshToken.ExpireTime;
