@@ -50,8 +50,8 @@ namespace Xchanger_RestApi.Models
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AcceptDate)
-                    .HasColumnName("accept_date")
-                    .HasColumnType("date");
+                    .HasColumnName("accept_date");
+                    //.HasColumnType("date");
 
                 entity.Property(e => e.InitiatorId).HasColumnName("initiator_id");
 
@@ -60,8 +60,8 @@ namespace Xchanger_RestApi.Models
                 entity.Property(e => e.ItemId).HasColumnName("item_id");
 
                 entity.Property(e => e.RequestDate)
-                    .HasColumnName("request_date")
-                    .HasColumnType("date");
+                    .HasColumnName("request_date");
+                    //.HasColumnType("date");
 
                 entity.Property(e => e.State).HasColumnName("state");
 

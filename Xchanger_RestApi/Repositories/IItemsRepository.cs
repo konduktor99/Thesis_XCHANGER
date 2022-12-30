@@ -13,7 +13,7 @@ namespace Xchanger_RestApi.Repositories
         public Task<GetItemDTO> GetItemDtoAsync(int idItem);
         public Task<Item> GetItemAsync(int idItem);
         public Task<Item> CreateItemAsync(CreateItemDTO itemDTO, int userId);
-        public Task<Item> UpdateItemAsync(int idItem, CreateItemDTO itemDTO);
-        public Task<Item> DeleteItem(int IdItem);
+        public Task<Item> UpdateItemAsync(Item item, CreateItemDTO itemDTO);
+        public Task<Item> DeleteItem(int idItem);
     }
 }

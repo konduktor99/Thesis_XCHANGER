@@ -95,8 +95,6 @@ namespace Xchanger_RestApi.Repositories
             item.PublicationDate = DateTime.Today;
 
             _dbContext.Entry(item).State = EntityState.Modified;
-            //_dbContext.Entry(user).State = EntityState.Modified;
-           // _dbContext.Entry(category).State = EntityState.Modified;
            
             await _dbContext.Items.AddAsync(item);
             await _dbContext.SaveChangesAsync();
@@ -107,10 +105,9 @@ namespace Xchanger_RestApi.Repositories
             return item;
         }
 
-        public async Task<Item> UpdateItemAsync(int idItem, CreateItemDTO itemDTO)
+        public async Task<Item> UpdateItemAsync(Item item, CreateItemDTO itemDTO)
         {
             
-            var item = await GetItemAsync(idItem);
 
             if (item != null)
             {
@@ -132,7 +129,6 @@ namespace Xchanger_RestApi.Repositories
 
         public async Task<Item> DeleteItem(int idItem)
         {
-            //var item = await GetItemAsync(idItem);
             var item = await _dbContext.Items
             .Include(b => b.ExchangeItems)
             .Include(b => b.ExchangeItems2)

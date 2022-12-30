@@ -13,9 +13,11 @@ namespace Xchanger_RestApi.Models
         [Key]
         [Column("id")]
         public int Id { get; set; }
-        [Column("accept_date", TypeName = "date")]
+        [Column("accept_date")]
         public DateTime? AcceptDate { get; set; }
-        [Column("request_date", TypeName = "date")]
+        [Column("reply_date")]
+        public DateTime? ReplyDate { get; set; }
+        [Column("request_date")]
         public DateTime RequestDate { get; set; }
         [Column("state")]
         public byte State { get; set; }
@@ -23,6 +25,12 @@ namespace Xchanger_RestApi.Models
         public int ItemId { get; set; }
         [Column("item_2_id")]
         public int? Item2Id { get; set; }
+        [Column("mess_1")]
+        [StringLength(90)]
+        public string Mess1 { get; set; }
+        [Column("mess_2")]
+        [StringLength(90)]
+        public string Mess2 { get; set; }
         [Column("initiator_id")]
         public int InitiatorId { get; set; }
 

@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xchanger_RestApi.Models;
 using Xchanger_RestApi.DTOs;
 using Xchanger_RestApi.Repositories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using Xchanger_RestApi.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xchanger_RestApi.Controllers
 {
@@ -118,7 +115,6 @@ namespace Xchanger_RestApi.Controllers
 
 
         [HttpGet("{idItem}")]
-        [Authorize]
         public async Task<IActionResult> GetItemDtoAsync([FromRoute] int idItem)
         {
             try
@@ -168,50 +164,21 @@ namespace Xchanger_RestApi.Controllers
         }
 
         [HttpPost("CreateItem")]
-        //[DisableRequestSizeLimit,RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue, ValueLengthLimit = int.MaxValue)]
+        [Authorize]
         public async Task<IActionResult> CreateItem([FromForm] CreateItemDTO itemDTO)
         {
             try
             {
+                var userId = JwtDecoder.GetClaimFromJwt(Request.Headers["authorization"].ToString().Substring(7),"id");
 
-                var jwt = Request.Headers["authorization"].ToString().Substring(7);
-                var handler = new JwtSecurityTokenHandler();
-                var jsonToken = handler.ReadToken(jwt);
-                var tokenS = jsonToken as JwtSecurityToken;
-                var userId = Int32.Parse(tokenS.Claims.First(claim => claim.Type == "id").Value);
-
+                if (userId == null)
+                    return Unauthorized();
 
                 var files = itemDTO.Files;
                 itemDTO.Files = null;
 
-                var item = await _repository.CreateItemAsync(itemDTO, userId);
+                var item = await _repository.CreateItemAsync(itemDTO, (int)userId);
 
-                saveImages(files, item.Id);
-
-
-                    return Ok(item);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
-            }
-
-        }
-
-        [HttpPut("{idItem}")]
-        public async Task<IActionResult> UpdateItem([FromForm] CreateItemDTO itemDTO, [FromRoute] int idItem)
-        {
-            try
-            {
-                var item = await _repository.UpdateItemAsync(idItem, itemDTO);
-
-
-                if (item == null)
-                    return NotFound("Nie znaleziono przedmiotu");
-
-                var files = itemDTO.Files;
-                itemDTO.Files = null;
                 saveImages(files, item.Id);
 
                 return Ok(item);
@@ -220,25 +187,70 @@ namespace Xchanger_RestApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(400, "Nieprawidłowe rządanie" + ex);
+            }
+
+        }
+        [HttpPut("{idItem}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateItem([FromForm] CreateItemDTO itemDTO, [FromRoute] int idItem)
+        {
+            
+            try
+            {
+                var userId = JwtDecoder.GetClaimFromJwt(Request.Headers["authorization"].ToString().Substring(7), "id");
+                if (userId == null)
+                    return Unauthorized();
+
+                var item = await _repository.GetItemAsync(idItem);
+                if (userId != item.UserId)
+                    return Unauthorized("Nie można ingerować w ogłoszenie innego użytkownika");
+
+                if (item == null)
+                    return NotFound("Nie znaleziono przedmiotu");
+
+                var updatedItem = await _repository.UpdateItemAsync(item, itemDTO);
+
+
+
+                var files = itemDTO.Files;
+                itemDTO.Files = null;
+                saveImages(files, updatedItem.Id);
+
+                return Ok(updatedItem);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, "Nieprawidłowe rządanie");
             }
 
         }
         [HttpDelete("DeleteItem/{idItem}")]
+        [Authorize]
         public async Task<IActionResult> DeleteItem([FromRoute] int idItem)
         {
             try
             {
-                var item = await _repository.DeleteItem(idItem);
+                var userId = JwtDecoder.GetClaimFromJwt(Request.Headers["authorization"].ToString().Substring(7), "id");
+                if (userId == null)
+                    return Unauthorized();
+
+                var item = await _repository.GetItemAsync(idItem);
+                    if (userId != item.UserId)
+                        return Unauthorized("Nie można ingerować w ogłoszenie innego użytkownika");
+
+
+                var deletedItem = await _repository.DeleteItem(idItem);
 
                 if (item == null)
                     return NotFound("Nie znaleziono przedmiotu");
 
-                return Ok(item);
+                return Ok(deletedItem);
 
         }
             catch (Exception ex)
             {
-                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
+                return StatusCode(400, "Nieprawidłowe rządanie");
             }
 
 
