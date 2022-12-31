@@ -2,7 +2,7 @@
 
  <div class="main-item-form">
      
-      <form class="sign-log-in-form" name="sign-log-in-form" @submit="validateForm">
+      <form class="sign-log-in-form" name="sign-log-in-form" @submit.prevent="submit">
         <h2 class="form-header"> Logowanie</h2>
 
          <router-link  to="/signin">Rejestracja <i class="fa fa-chevron-right" ></i></router-link>
@@ -19,7 +19,7 @@
         <br>
 
             <button type="submit" class="form-button-submit">Zaloguj się  <i class="fa fa-sign-in"></i></button>
-            <router-link to="/">
+            <router-link :to="this.returnPrevious">
               <button type="button" class="form-button-cancel">Anuluj <i class="fa fa-times"></i></button>
             </router-link>
       
@@ -29,6 +29,9 @@
 </template>
 
 <script>
+import axios from 'axios'
+import jwt_decode from 'jwt-decode'
+
 function checkDanger(value) {
     
     var dangerous = /.*(?=.*[%/)(+><"'-]).*/;
@@ -56,13 +59,11 @@ export default {
     data()
     {
         return {
-            error:[],
             login:null,
             loginError:null,
-            // email:null,
-            // emailError:null,
             password:null,
             passwordError:null,
+            returnPrevious: !this.$router.options.history.state.back || this.$router.options.history.state.back == '/signin' ? '/items' : this.$router.options.history.state.back,
         }
     },
 
@@ -72,13 +73,10 @@ export default {
         this.loginError=""
         var input = document.getElementById("login");
         input.classList.remove("error-input");
-        input.classList.add("correct-input");
        
         if (!this.login) {
             errorText = "Podaj login."
             this.loginError = errorText
-            this.error.push(errorText)
-            input.classList.remove("correct-input");
             input.classList.add("error-input");
             return false
         }
@@ -86,16 +84,12 @@ export default {
         {
             errorText = "Login zawiera niebezpieczne znaki."
             this.loginError = errorText
-            this.error.push(errorText)
-            input.classList.remove("correct-input");
             input.classList.add("error-input");
             return false
         }   
         if (!checkTextLengthRange(this.login,7,20)) {
             errorText = "Login musi zawierać od 7 do 20 znaków."
             this.loginError = errorText
-            this.error.push(errorText)
-            input.classList.remove("correct-input");
             input.classList.add("error-input");
             return false
         } 
@@ -134,8 +128,6 @@ export default {
         //     input.classList.add("error-input");
         //     return false
         // } 
-        
-
         // return true
         // },
          validatePassword() {
@@ -144,13 +136,10 @@ export default {
             var regexPassword = /(?=.*[\\!@#$^*\\/)(+=._-])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}/;
             var input = document.getElementById("password");
             input.classList.remove("error-input");
-            input.classList.add("correct-input");
 
             if (!this.password) {
                 errorText = "Podaj hasło."
                 this.emailError = errorText
-                this.error.push(errorText)
-                input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 return false
             }
@@ -158,8 +147,6 @@ export default {
             {
                 errorText = "Hasło zawiera niebezpieczne znaki."
                 this.passwordError = errorText
-                this.error.push(errorText)
-                input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 return false
             } 
@@ -167,8 +154,6 @@ export default {
             {
                 errorText = "Hasło powinno zawierać od. 8 do 30 znaków w tym małą, wielką literę i znak specjalny."
                 this.passwordError = errorText
-                this.error.push(errorText)
-                input.classList.remove("correct-input");
                 input.classList.add("error-input");
                 return false
             } 
@@ -176,12 +161,45 @@ export default {
             
             return true
         },
-        validateForm(e) {
+        submit() {
             const validLogin = this.validateLogin();
-            //const validEmail = this.validateEmail();
             const validPassword = this.validatePassword();
-            if(!(validLogin && validPassword ))
-                e.preventDefault()
+            if(validLogin && validPassword ){
+
+                axios.post(`Users/Login`,{
+                    login: this.login,
+                    password: this.password
+                },
+                {
+                    withCredentials: true
+                }
+                )
+                .then((response)=>{
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${response.data}`
+                    const decodedJwt = jwt_decode(response.data)
+                    this.$emit('currUser',decodedJwt["name"])
+                    
+                    this.$router.push(this.returnPrevious);
+                }).catch(error => {
+                let mess;
+                switch (error.response.status) {
+                    case 400:
+                    
+                    this.passwordError = error.response.data
+                    return;
+                    case 404:
+                    mess = error.response.data
+                    break;
+                    case 500:
+                    mess = error.response.data
+                    break;
+                    default:
+                    mess = "Wystąpił błąd"
+                }
+                this.error = `${error.response.status} ${mess} :(`
+            });
+            }
+                
         }
     },
 

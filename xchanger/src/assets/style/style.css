@@ -13,7 +13,7 @@ body {
 
 main
  {
-    background-color: #c2c2c2;
+    background-color: #cbcbcb;
      min-height: 74vh; 
     
 }
@@ -44,12 +44,14 @@ header{
 
 
   main {
-    margin-left: 6rem;
-    margin-right: 6rem;
+    margin-left: 5rem;
+    margin-right: 5rem;
     padding: 1rem;
+    word-wrap:break-word;
    
   }
-
+ 
+  
 
 
   #add-article-tile{
@@ -77,23 +79,19 @@ header{
     margin: 1%;
     padding: 1%;  
     height: 98%;
-  
-
-    
-    
-    
     
    
 }  
 
 .article-tile-buttons{
-    width: 100%;
-    
+    width: 100%; 
     bottom: 5px; 
     text-align: center;
     margin-bottom: 4px;
+    margin-top: 2px;
     
 }
+
 .article-tile h5{
     font-weight: 1000;
    
@@ -112,10 +110,14 @@ header{
 .article-tile img{
     border-radius: 10px;
     margin-bottom: 20px;
-    width:100%;
+    max-width: 100%;
+    max-height: 97%;
+    /* max-width: 400px; */
+    /* object-fit:scale-down; */
+    
+}
+.article-tile-img-wrapper{
     height: 55%;
-    max-width: 400px;
-    object-fit: cover;
 }
 
 .slideshow {
@@ -176,7 +178,8 @@ header{
 }
   .main-main {
     display: grid;
-    grid-auto-rows: 1fr;
+    grid-auto-rows: 650px;
+
     grid-gap: 15px;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     height: fit-content;
@@ -200,6 +203,7 @@ header{
   .details-item-user{
     border-radius: 10px;
     margin: 2px;
+    min-width: fit-content;
     padding: 1rem;
     background: floralwhite;
   }
@@ -218,6 +222,70 @@ header{
     grid-column: span 2;
   }
 
+  .exchanges-list-img{
+    height: 150px;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 300px;
+    right: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 70px;
+    word-wrap:normal;
+    box-shadow: 0px 10px 10px 12px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    border-top-left-radius:  10px;
+    z-index: 1;
+  }
+  
+  .sidebar a{
+    padding: 5px 5px 5px 15px;
+    text-decoration: none;
+    font-size: 23px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+  }
+  .sidebar h3 {
+    padding: 5px 5px 5px 15px;
+    font-size: 32px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  .sidebar a:hover {
+    color: wheat;
+  }
+  
+  .sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+  
+  .openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+  }
+  
+  .openbtn:hover {
+    background-color: #444;
+  }
+
 .button {
     background-color: #4CAF50; /* Green */
     border: none;
@@ -232,19 +300,51 @@ header{
     cursor: pointer;
   }
 
+  .button-profile{
+    width:160px;
+    border-radius: 10px;
+    padding: 8px;
+    color:white;
+    font-size:16px;
+    border-width: 0;
+  }
+  .button-profile{
+    background-color: black;
+  }
+  .button-requests{
+    width: 50px;
+    height: 200px;
+    color: #4e5581;
+    background-color: rgb(0, 0, 0);
+    position: fixed;
+    right: 0;
+    top: 400px;
+    border-top-left-radius:  10px;
+    border-bottom-left-radius:  10px;
+    padding: 8px;
+    color:white;
+    font-size:16px;
+    border-width: 0;
 
+  }
   
   .button-profile:hover {
     background-color: #555555;
     color: white;
+    transition: 0.3s;
+  }
+  .button-requests:hover {
+    background-color: #535116;
+    color: white;
+    transition: 0.3s;
   }
   
   .dropdown {
     position: relative;
     display: inline-block;
     margin-right: 65px;
-    
   }
+
   
   .dropdown-content {
     display: none;
@@ -262,11 +362,16 @@ header{
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    cursor:pointer;
   }
 
   .dropdown-content a:hover {background-color: rgb(161, 143, 63);}
 
  .dropdown:hover .dropdown-content {display: block;}
+ .dropdown:hover button {    
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
 
 nav {
     background-color: #9ec2da;
@@ -311,11 +416,11 @@ nav ul li a.active {
 
     text-align: center;
     
-    margin: 10%;
+   
     }
 #error h1{
     font-weight: bolder;
-    color:rgb(147, 147, 186);
+    color:rgb(114, 114, 169);
 }
 
 main h2 {
@@ -437,8 +542,6 @@ main .main-site-desc{
     background:#7991a1;
 }
 
-
-
 form label{
     display: block;
     margin-top: 0.3rem;
@@ -454,6 +557,13 @@ form label{
     font-size: 12px;
 }
 
+.already-requested-exchange{
+    color: #587c5b;
+    background-color: #c4a8dc;
+    border-radius: 5px;
+    padding: 8px;
+    margin: 5px;
+}
 
 form input.error-input,
 form select.error-input,
@@ -499,6 +609,66 @@ form textarea.correct-input {
     padding: 2px 6px 2px 6px;
     margin-top: 8px;
 }
+
+.exchange-resp-wrapper{
+    width: 55%;
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right
+}
+
+.bubble1, .bubble2 {
+    margin: 5px;
+    position: relative;
+   
+    width:55%;
+    background: rgb(159, 158, 234);
+    border-radius: 20px;
+    padding: 5px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    margin-bottom: 28px;
+  }
+  .bubble2{
+    background: rgb(97, 150, 206);
+    width: 100%;
+  }
+  
+  .bubble-bottom-left1:before, .bubble-bottom-left2:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 11px solid rgb(159, 158, 234);
+    border-right: 13px solid transparent;
+    border-top: 11px solid rgb(159, 158, 234);
+    border-bottom: 13px solid transparent;
+    
+    left: 25px;
+    bottom: -24px;
+  }
+  .bubble-bottom-left2:before {
+    border-right: 11px solid rgb(97, 150, 206);
+    border-left: 13px solid transparent;
+    border-top: 11px solid rgb(97, 150, 206);
+    left: unset;
+    right: 25px;
+  }
+
+  .reject-ex-btn {
+    font-size: 4ch;
+    
+    color: #9fab98;
+    margin: 0;
+
+  }
+
+  .search-form{
+    margin:auto;
+    margin-right:10px;
+  }
+
+
 
 @media all and (max-width: 855px){
 
@@ -608,8 +778,12 @@ form textarea.correct-input {
         .list-actions-button-delete{
             width: 30px;
         }
+        .search-form{
+          margin:4px;
+          width: 74%;
+          margin-right: unset;
+        }
         
-
 
 
 }
@@ -642,12 +816,21 @@ form textarea.correct-input {
     .main-main {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         height: fit-content;
-        
-        
+              
     
       }
+      .exchange-resp-wrapper{
+        width: 100%;
+    }
     
-    
+    .bubble1, .bubble2 {
+        width:100%;
+      }
+
+      .search-form{
+        width: 100%;
+      }
+       
 }
 
 .loader-wrapper{
@@ -694,5 +877,7 @@ form textarea.correct-input {
       top: 24px;
       height: 32px;
     }
+
+    
   }
   

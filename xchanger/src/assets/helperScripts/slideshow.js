@@ -10,7 +10,7 @@ images[2] = "../images/kask3.png";
 
 
 function setImg(){
-  console.log(i)
+
   document.slide.src = images[0];
 }
 
@@ -20,7 +20,7 @@ function changeImgForward(){
 	} else { 
 		i = 0;
 	}
-  console.log(i)
+
 	document.slide.src = images[i];
 
 }
@@ -31,7 +31,7 @@ function changeImgBackwards(){
 	} else { 
 		i = images.length-1;
 	}
-  console.log(i)
+
 	document.slide.src = images[i];
 
 }

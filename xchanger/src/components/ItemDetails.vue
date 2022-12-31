@@ -15,9 +15,24 @@
       <h5>{{item.location}}</h5>
       <h5>{{item.user.phoneNumber}}</h5>
       <b v-if="item.isNew" class="new-label">NOWE</b><b v-else class="used-label">UŻYWANE</b><br>
-      <router-link :to="{ path: `/items`, query: {user:item.user.login}}" style="text-decoration: none; color: inherit;">Więcej od tego ogłoszeniodawcy <i class="fa fa-chevron-right" ></i></router-link><br/><br/>
-      <button type="button" class="btn btn-success btn-block">Zaproponuj wymianę <i class="fa fa-exchange" aria-hidden="true"></i></button>
-
+      <!-- <b style="color:grey;">{{item.category.name}} </b><br> -->
+      <router-link :to="{ path: `/items`, query: {user:item.user.login}}" style="text-decoration: none; color: inherit;"><b>Więcej od tego ogłoszeniodawcy</b> <i class="fa fa-chevron-right" ></i></router-link><br/><br/>
+      <div v-if="loggedUser">
+      <div v-if="loggedUser!=item.user.login">
+      <button v-if="replyingExchange && !proceedExReq" type="button" @click="proceedExRequest" class="btn btn-success btn-block"> Wymień za {{this.exchangeItem}} <i class="fa fa-exchange" aria-hidden="true"></i></button>
+      <button v-else-if="!proceedExReq && !requested" type="button" @click="proceedExRequest" class="btn btn-success btn-block">Zaproponuj wymianę <i class="fa fa-exchange" aria-hidden="true"></i></button>
+      <div v-else-if="!requested">
+        <textarea class="form-control" v-model="requestMessage" id="desc" rows="2" maxlength="90" name="description" placeholder="Wiadomość do ogłoszeniodawcy" ></textarea>
+            <div class="article-tile-buttons" >
+              <button  class="btn btn-success" @click="exchange"><i class="fa fa-paper-plane" ></i></button>
+              <button  class="btn btn-secondary" @click="cancelExRequest" style="margin-left:5px;"><i class="fa fa-close" ></i></button>
+            </div>
+      </div>
+      <b v-if="requested" class="already-requested-exchange">Zaproponowano wymianę <i class="fa fa-check-circle" ></i></b>
+      </div>
+      </div>
+      <router-link v-else to="/login" class="btn btn-success btn-block">Zaloguj się, by zaproponować wymianę.</router-link>
+      
     </div>
 
     <div class="description-item" >
@@ -27,7 +42,7 @@
     <!-- <img src="../assets/images/kask3.png" /> -->
     </div>
 </div>
-<div v-else-if="!items && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
+<div v-else-if="!item && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
 <div v-else id="error" style="text-align: center;"> 
  <h1 style="font-weight: bolder;color:rgb(147, 147, 186);">{{error}}</h1>
 </div>
@@ -36,6 +51,7 @@
 <script>
 
 import axios from 'axios'
+import jwt_decode from 'jwt-decode';
 
 export default {
   name: 'ItemDetails',
@@ -44,6 +60,9 @@ export default {
     desc: String,
     ownerNickname:String,
     ownerPhoneNum:String,
+    loggedUser: String,
+    replyingExchange: Number,
+    exchangeItem: String,
     
     
   },
@@ -55,12 +74,21 @@ export default {
            imagesBytes : [],
            imageSrc: require("../assets/images/no-image.jpg"),
            item: undefined,
-           error: undefined
+           error: undefined,
+           proceedExReq: false,
+           requestMessage: undefined,
+           requested: false,
+           
       }
     },
-
   methods:{
 
+    proceedExRequest(){ console.log("ZLEe")
+      this.proceedExReq = true
+    },
+    cancelExRequest(){
+      this.proceedExReq = false
+    },
     
     getItem(id){
       axios.get(`Items/${id}`)
@@ -69,26 +97,98 @@ export default {
         if(this.item.imgBytesList.length>0){
           this.imagesBytes = this.item.imgBytesList;
           this.imageSrc=`data:image/jpeg;base64,${this.imagesBytes[0]}`
+
+          if(response.config.headers['Authorization'])
+          {
+              const decodedJwt = jwt_decode(response.config.headers['Authorization'].substring(7))
+              this.$emit('currUser',decodedJwt["name"])
+          }
+          
+          
         }
       }).catch(error => {
        
        let mess;
-       switch (error.response.status) {
-          case 400:
-            mess = "Nieprawidłowe rządanie"
-            break;
-          case 404:
-            mess = error.response.data
-            break;
-          case 500:
-            mess = "Wystąpił błąd wewnętrzny serwera"
-            break;
-        }
-          this.error = `${error.response.status} ${mess} :(`
+          if(!error.response){
+            this.error = 'Wystąpił błąd'
+          }else{
+            switch (error.response.status) {
+            case 400:
+              mess = "Nieprawidłowe rządanie"
+              break;
+            case 500:
+              mess = "Wystąpił błąd wewnętrzny serwera"
+              break;
+            default:
+              mess = error.response.data
+          }
+            this.error = `${error.response.status} ${mess} :(`    
+          }
+       });
        
-        });
     },
 
+    exchange(){
+      if(this.replyingExchange){
+         axios.put(`Exchanges/ReplyExchangeRequest/${this.replyingExchange}`, {
+          item2Id: this.item.id,
+          mess2: this.requestMessage
+        })
+          .then(()=>{ 
+           this.requested = true
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd2"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+          console.log(this.error)
+        });
+      }else{
+         axios.post(`Exchanges/RequestExchange`, {
+          itemId: this.item.id,
+          mess1: this.requestMessage
+        })
+          .then(()=>{ 
+           this.requested = true
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd2"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+          console.log(this.error)
+        });
+      }
+       
+    },
+
+    isRequested(id){
+        axios.get(`Exchanges/IsRequested/${id}`)
+          .then( response=>{ 
+           this.requested = response.data
+          }).catch(error => {console.log(error)});
+    },
       
     changeImgForward(){
         if(i < this.imagesBytes.length - 1){
@@ -115,43 +215,15 @@ export default {
  },
   mounted:function(){
       this.getItem(this.id);
+      if(this.loggedUser)
+        this.isRequested(this.id)
   }
 
 
   
 }
+var i = 0; 
 
-
-var i = 0; 			// Start Point
-// var images = [];	// Images Array	 
-// // Image List
-// images[0] = "../assets/images/kask2.png";
-// images[1] = "../assets/images/kask2.png";
-// images[2] = "../assets/images/kask3.png";
-
-
-// function setImg(){
-//     console.log(i)
-//     document.slide.Bytes = this.images[0];
-// }
-
-
-
-
-// function readURL(input) {
-//   if (input.files && input.files[0]) {
-//     var reader = new FileReader();
-
-//     reader.onload = function (e) {
-//       $('#blah').attr('Bytes', e.target.result).width(150).height(200);
-//     };
-
-//     reader.readAsDataURL(input.files[0]);
-//   }
-// }
-
-
-//window.onload=setImg;
 </script>
 
 

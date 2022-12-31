@@ -8,19 +8,43 @@ import  "vue-google-autocomplete";
 import VueGoogleMaps from '@fawmi/vue-google-maps'
 // import urls from 'urls.js'
 import axios from 'axios'
+import VueCookies from 'vue-cookies';
+import Toaster from '@meforma/vue-toaster';
 
- //axios.defaults.baseURL = 'https://192.168.1.14:44320/'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
 axios.defaults.baseURL = 'https://localhost:44320/'
-
 
 // createApp(App).use(Router).mount('#app')
 createApp(App)
   .use(VueGoogleMaps, {
     load: {
-      key: "AIzaSyB2SBS-AKo7ajr2zpRPQrDXz-f8pBdW--M",
+      key: "AIzaSyA5KpvarAKHNklCd6YM_X-WowziB4ROVBE",
       libraries: "places"
     }
   })
   .use(Router)
-
+  .use(VueCookies)
+  .use(Toaster)
   .mount("#app");
+
+
+ axios.interceptors.response.use(resp => resp, async error => {
+
+
+    if (error.response.status === 401 && !error.config.headers['was-refreshed'] && error.response.data!="Nie można ingerować w ogłoszenie innego użytkownika" && error.response.data!="Nie można ingerować w nieswoją transakcję wymiany") {
+        const {status, data} = await axios.post('Users/refresh-token',{},{withCredentials:true, headers:{'was-refreshed':true}} );
+    
+        if (status === 200) {
+            
+            error.config.headers['Authorization'] = `Bearer ${data}`
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data}`;
+           
+            return axios(error.config);
+        }
+    }
+
+    return Promise.reject(error);
+});
+
+

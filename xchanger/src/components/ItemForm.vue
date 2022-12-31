@@ -67,7 +67,6 @@
 
 var i = 1
 i = false
-console.log(i)
 function checkDanger(value) {
     
     var dangerous = /.*(?=.*[%/)(+><"'-]).*/;
@@ -145,8 +144,7 @@ export default {
                     const img = document.createElement("img");
                     img.classList.add("uploaded-pic");
                     img.src = picFile.result;
-                    //const img = document.createElement("div");
-                    //div.innerHTML = `<img class="uploaded-pic" src="${picFile.result}" title="${picFile.name}"/>`;
+
                     output.appendChild(img);
                   });
                   picReader.readAsDataURL(files[i]); 
@@ -158,13 +156,6 @@ export default {
        },
       
 
-        // validateForm(e) {
-        //     const validLogin = this.validateLogin();
-        //     //const validEmail = this.validateEmail();
-        //     const validPassword = this.validatePassword();
-        //     if(!(validLogin && validPassword ))
-        //         e.preventDefault()
-        // }
 
 
          validateTitle() {
@@ -249,23 +240,12 @@ export default {
             validateLocation() {
               
               this.location = document.getElementById("autocomplete-loc").value
-              console.log(this.location);
               this.placeSelected = true;
               
               this.locationError=""
               var input = document.getElementById("autocomplete-loc");
               input.classList.remove("error-input");
               input.classList.add("correct-input");
-        
-           
-              // if (checkDanger(this.location))
-              // {
-              //     input.classList.remove("correct-input");
-              //     input.classList.add("error-input");
-              //     errorText = "Lokalizacja zawiera niebezpieczne znaki."
-              //     this.locationError = errorText
-              //     this.placeSelected = false;
-              // } 
     
             
         },

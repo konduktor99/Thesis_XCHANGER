@@ -1,6 +1,7 @@
 <template>
-
-<div class="main-item-form">
+<div>
+<h1 v-if="error">{{error}}</h1>
+<div v-else class="main-item-form">
 
       <form class="item-form" name="item-form" @submit.prevent="submit">
 
@@ -30,6 +31,14 @@
           <span class="inputAlert" id="location-alert">{{locationError}}</span> 
           </div>
           <div class="form-group">
+             <label for="category">Kategoria</label>
+            <select id="category" class="form-control" v-model="item.categoryId" @change="validateCategory">
+              <option value="" disabled >- Wybierz kategorię -</option>
+              <option v-for="category in categories" :key="category" :value="category.id">{{category.name}}</option>
+            </select>
+             <span class="inputAlert" id="cat-alert">{{categoryError}}</span> 
+          </div>
+          <div class="form-group">
             <label for="desc">Opis</label>
             <textarea class="form-control" id="desc" rows="5"  name="description" v-model="item.description" @change="validateDesc" ></textarea>
             <span class="inputAlert" id="desc-alert">{{descriptionError}}</span> 
@@ -46,7 +55,7 @@
             <div class="form-check">
               <input class="form-check-input" type="radio" name="stan" id="usedRadio" :value="false"  v-model="item.isNew" :checked="item.isNew === 'false'"  >
               <label  for="usedRadio">
-                Używany {{item}}
+                Używany
               </label>
             </div>
             
@@ -62,7 +71,7 @@
       </form>
       
     </div>
-
+</div>
 </template>
 
 <script>
@@ -70,7 +79,7 @@ import axios from 'axios'
 
 function checkDanger(value) {
     
-    var dangerous = /.*(?=.*[%/)(+><"'-]).*/;
+    var dangerous = /.*(?=.*[/><{}'-]).*/;
 
     if(String(value).match(dangerous))
         return true
@@ -111,11 +120,12 @@ export default {
         return {
            // id: this.$route.params.id, 
             item: this.$route.query,
-            
+            error:null,
             titleError:null,
             filesError:null,
             // email:null,
             // emailError:null,
+            categoryError:null,
             location:null,
             locationError:null,
             placeSelected:true,
@@ -129,7 +139,8 @@ export default {
             files: [],
             returnPrevious: !this.$router.options.history.state.back ? '/items' : this.$router.options.history.state.back,
             rozmiarMB: null,
-            sizeSum:null
+            sizeSum:null,
+            categories:[]
 
            
         }
@@ -143,7 +154,7 @@ export default {
 
       submit(){
       this.item.userId = 6;
-      this.item.categoryId =1;
+      //this.item.categoryId =1;
       if(this.validateForm()){
 
         var formData = new FormData();
@@ -180,7 +191,6 @@ export default {
           
           axios.put(`Items/${this.item.id}`,formData)
           .then(()=>{
-           console.log("SSSSSSSS")
            this.$router.push(this.returnPrevious);
           }).catch(error => {
           let mess;
@@ -231,6 +241,30 @@ export default {
         });
       },
 
+      getCategories(){
+         axios.get('Categories')
+          .then((response)=>{
+           this.categories = response.data
+           this.showImages()
+          }).catch(error => {
+          let mess;
+          switch (error.response.status) {
+              case 400:
+                mess = "Nieprawidłowe rządanie"
+                break;
+              case 404:
+                mess = error.response.data
+                break;
+              case 500:
+                mess = error.response.data
+                break;
+              default:
+                mess = "Wystąpił błąd"
+            }
+          this.error = `${error.response.status} ${mess} :(`
+        });
+      },
+
        onImgsSelected(e){
          if (window.File && window.FileReader && window.FileList && window.Blob) { 
                this.files = e.target.files; 
@@ -240,8 +274,8 @@ export default {
             this.sizeSum+= this.files[i].size;
           }
           this.rozmiarMB = Math.floor(this.sizeSum / (1024*1024))
+
           if(this.sizeSum>30000000){
-              
             alert(`Zbyt duży rozmiar plików.  aktualnie ${this.rozmiarMB} MB (maks. 28 MB)`);
             this.tooBigPics=true;
             return
@@ -315,6 +349,26 @@ export default {
             return true;
             
         },
+        validateCategory() {
+            var errorText=""
+            this.CategoryError=""
+            var input = document.getElementById("category");
+            input.classList.remove("error-input");
+            input.classList.add("correct-input");
+            
+        
+            if (!this.item.categoryId) {
+                errorText = "Wybierz kategorię."
+                this.categoryError = errorText
+                input.classList.remove("correct-input");
+                input.classList.add("error-input");
+                return false
+            }
+            
+            
+            return true;
+            
+        },
         validateDesc() {
             var errorText=""
             this.descriptionError=""
@@ -375,18 +429,20 @@ export default {
           validateForm() {
             const validTitle = this.validateTitle();
             const validDesc = this.validateDesc();
+            const validCategory = this.validateCategory();
             //this.validateLocation();
            
            if(!this.placeSelected)
               this.locationError = "Wybierz lokalizacje z listy."
             
            
-            return (validTitle && validDesc && !this.tooBigPics)
+            return (validTitle && validDesc && validCategory && !this.tooBigPics)
                
         }
     },
 
     mounted:function(){
+      this.getCategories()
       if(!this.create)
         this.retrieveImages()
         

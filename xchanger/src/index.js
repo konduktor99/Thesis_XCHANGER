@@ -7,7 +7,7 @@ import NotFound from './components/NotFound.vue'
 // import UserItemTiles from './components/UserItemTiles.vue'
 // import ItemForm from './components/ItemForm.vue'
 import EditItemForm from './components/EditItemForm.vue'
-
+import ExchangesList from './components/ExchangesList.vue'
 
 const routes = [
   // {
@@ -28,54 +28,63 @@ const routes = [
     component: SignInForm
   },
   {
+    path: '/login',
+    component: LogInForm
+  },
+  {
+    path: '/exchanges/requested',
+    props: { exchangesType: 0},
+    component: ExchangesList
+  },
+  {
+  path: '/exchanges/received',
+  props: { exchangesType: 1},
+  component: ExchangesList
+  },
+  {
+  path: '/exchanges/history',
+  props: { exchangesType: 2},
+  component: ExchangesList
+  },
+  {
     path: '/items',
     component: ItemTiles,
-    props: route => ({  user: route.query.user,  category: route.query.category}),
-    children: [
-
-      { path: 'login', component: LogInForm },
-    ],
+    props: route => ({  user: route.query.user,
+      category: route.query.category,
+      replyingExchange: route.query.replyingExchange,
+      exchangeItem:route.query.exchangeItem,
+    }),
   },
-//{
-  // path: '/items/user/:login',
-  //   component: ItemTiles,
-  //   props: true,
-  //   // children: [
 
-  //   //   { path: 'login', component: LogInForm },
-  //   // ],
-  // },
   {
     path: '/items/:id',
     component: ItemDetails,
-    props: true
-    //props: {imageUrl: require("../assets/images/kask.png")}
+    props: route => ({replyingExchange: route.query.replyingExchange,
+      exchangeItem:route.query.exchangeItem,
+    }),
   },
   {
     path: '/my-profile/edit-item/:id',
     component: EditItemForm,
     props: true
 
-    //props: {imageUrl: require("../assets/images/kask.png")}
   },
   {
+
     path: '/my-profile',
     component: ItemTiles,
 
     props: route => ({  user: route.query.user,  category: route.query.category,  userAccess: true}),
-    //props: {imageUrl: require("../assets/images/kask.png")}
   },
   {
     path: '/my-profile/add-item',
     component: EditItemForm,
     props: { create: true},
-    //props: {imageUrl: require("../assets/images/kask.png")}
   },
 
   {
     path: '/:pathMatch(.*)*',
     component: NotFound,
-    //props: {imageUrl: require("../assets/images/kask.png")}
   },
 
 
