@@ -30,16 +30,42 @@ namespace Xchanger_RestApi.Controllers
 
         [HttpGet]
         
-        public async Task<IActionResult> GetActiveItems()
+        public async Task<IActionResult> GetActiveItems([FromQuery] SearchDTO search)
         {
 
             try
             {
+
                 var items = await _repository.GetActiveItemsAsync(null, null);
-                if (items.Count() > 0)
-                    return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
+                
+
+                if(search.Query!=null)
+                {
+                    if(search.Query.Length>2)
+                    {
+                        var keyWords = search.Query.ToLower().Split(null);
+                        List<GetItemsDTO> filteredItems = new List<GetItemsDTO>();
+                        foreach (var keyword in keyWords.Where(i => i != ""))
+                        {
+                            filteredItems.AddRange(items.Where(i => i.Title.ToLower().Contains(keyword)));
+                        }
+                        if (filteredItems.Count() > 0)
+                            return Ok(filteredItems.Distinct().Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
+                    }
+                    else
+                    {
+                        return NotFound("Nie znaleziono wyników dla \'"+ search.Query +"\'");
+                    }
+                    
+                }
                 else
-                    return NotFound("Nie znaleziono przedmiotów");
+                {
+                    if (items.Count() > 0)
+                        return Ok(items.Select(i => { i.ImgBytes = LoadMainImage(i.Id); return i; }));
+                }
+               
+                    
+                return NotFound("Nie znaleziono przedmiotów");
 
             }
             catch (Exception)
@@ -241,6 +267,10 @@ namespace Xchanger_RestApi.Controllers
 
 
                 var deletedItem = await _repository.DeleteItem(idItem);
+
+                var path = Path.Combine(_env.WebRootPath, "itemPics", idItem.ToString());
+                if (Directory.Exists(path))
+                    Directory.Delete(path, true);
 
                 if (item == null)
                     return NotFound("Nie znaleziono przedmiotu");
