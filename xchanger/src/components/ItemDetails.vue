@@ -43,7 +43,7 @@
     </div>
 </div>
 <div v-else-if="!item && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
-<div v-else id="error" style="text-align: center;"> 
+<div v-if="error" id="error" style="text-align: center;"> 
  <h1 style="font-weight: bolder;color:rgb(147, 147, 186);">{{error}}</h1>
 </div>
 </template>

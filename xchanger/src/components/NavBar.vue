@@ -13,7 +13,7 @@
         </div>
       </div></li>
       <form class="search-form" style="" @submit.prevent="">
-      <input style=" display:inline; width:65%" class="form-control mr-sm-2" v-model="this.search"  placeholder="Co Cię interesuje?" aria-label="Search">
+      <input style=" display:inline; width:60%" class="form-control mr-sm-2" v-model="this.search"  placeholder="Co Cię interesuje?" aria-label="Search">
       <router-link :to="{ path: `/items`, query: { search:this.search}}" @click="resetSearch" style=" display:inline; margin-left:5px;" class="btn btn-outline-success my-2 my-sm-0" >Szukaj <i class="fa fa-search"></i></router-link>
     </form>
 </ul>

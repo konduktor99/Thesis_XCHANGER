@@ -169,6 +169,8 @@ export default {
 
           axios.post(`Items/CreateItem`, formData)
           .then(()=>{ 
+              this.$toast.info(`Dodano ogłoszenie.`);
+              setTimeout(this.$toast.clear, 5000)
            this.$router.push(this.returnPrevious);
           }).catch(error => {
           let mess;
@@ -191,6 +193,8 @@ export default {
           
           axios.put(`Items/${this.item.id}`,formData)
           .then(()=>{
+            this.$toast.info(`Zaktualizowano ogłoszenie.`);
+            setTimeout(this.$toast.clear, 5000)
            this.$router.push(this.returnPrevious);
           }).catch(error => {
           let mess;
