@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using SixLabors.ImageSharp;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+
+
 
 namespace Xchanger_RestApi.Helpers
 {
@@ -17,63 +15,33 @@ namespace Xchanger_RestApi.Helpers
             
             _env = env;
         }
-        public static void SaveImages(IFormFile[] files, int itemId)
+
+
+
+        public static void GetImgDims(Image img, double mWidth, double mHeight, ref int outWidth, ref int outHeight)
         {
-            int counter = 1;
-            if (files != null)
+            double heightR = 0d;
+            double widthR = 0d;
+            if(img.Height > mHeight )
             {
-                var path = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
-                if (Directory.Exists(path))
-                    Directory.Delete(path, true);
-                Directory.CreateDirectory(path);
-                foreach (var file in files)
-                {
-                    string picName = "\\" + counter + "_itemPic_" + itemId + ".jpg";
-
-                    if (System.IO.File.Exists(path + picName))
-                        System.IO.File.Delete(path + picName);
-
-                    using (FileStream fs = System.IO.File.Create(path + picName))
-                    {
-                        file.CopyTo(fs);
-                        fs.Flush();
-                    }
-                    counter++;
-                }
-
+                heightR = (double)img.Height / mHeight;
             }
-
-        }
-        public static List<byte[]> LoadImages(int itemId)
-        {
-
-            var imgBytesList = new List<byte[]>();
-            var itemFolderPath = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
-
-            if (Directory.Exists(itemFolderPath))
-                foreach (string file in Directory.EnumerateFiles(itemFolderPath, "*.jpg"))
-                {
-                    imgBytesList.Add(System.IO.File.ReadAllBytes(file));
-                }
-            return imgBytesList;
-        }
-
-        public static byte[] LoadMainImage(int itemId)
-        {
-
-            byte[] imgBytes = null;
-            var itemFolderPath = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
-
-            string file;
-            if (Directory.Exists(itemFolderPath))
+            if (img.Width > mWidth)
             {
-                file = Directory.EnumerateFiles(itemFolderPath, "*.jpg").FirstOrDefault();
-                if (file != null)
-                    imgBytes = System.IO.File.ReadAllBytes(file);
+                widthR = (double)img.Width / mWidth;
             }
-
-
-            return imgBytes;
+             var r = Math.Max(widthR, heightR);
+            if(r != 0)
+            {
+                outHeight = (int)(img.Height / r);
+                outWidth = (int)(img.Width / r);
+            }
+            else
+            {
+                outHeight = img.Height;
+                outWidth = img.Width;
+            }
+            
         }
     }
 }

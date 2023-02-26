@@ -18,6 +18,7 @@ namespace Xchanger_RestApi.Models
         [Key]
         [Column("id")]
         public int Id { get; set; }
+
         [Required]
         [Column("name")]
         [StringLength(20)]

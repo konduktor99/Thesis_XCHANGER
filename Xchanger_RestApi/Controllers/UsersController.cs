@@ -15,18 +15,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Xchanger_RestApi.Controllers
 {
-    [Route("/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
 
         private readonly IUsersRepository _repository;
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _config;
 
         public UsersController(IUsersRepository repository, IConfiguration configuration)
         {
             _repository = repository;
-            _configuration = configuration;
+            _config = configuration;
         }
 
 
@@ -42,7 +42,7 @@ namespace Xchanger_RestApi.Controllers
                 user = await _repository.RegisterUserAsync(userDTO);
 
 
-                var jwt = GenerateToken(user);
+                var jwt = GenerateAccessToken(user);
 
                 var refreshToken = GenerateRefreshToken();
                 await SetRefreshToken(refreshToken, user.Login);
@@ -69,7 +69,7 @@ namespace Xchanger_RestApi.Controllers
                 return BadRequest("Nieprawidłowa nazwa użytkownika lub hasło.");
             }
 
-            var jwt = GenerateToken(user);
+            var jwt = GenerateAccessToken(user);
 
             var refreshToken = GenerateRefreshToken();
             await SetRefreshToken(refreshToken, user.Login);
@@ -85,16 +85,16 @@ namespace Xchanger_RestApi.Controllers
             {
                 HttpOnly = true,
                 Expires = DateTime.Now.AddMinutes(-1),
-                SameSite = SameSiteMode.None,
-                Secure = true
+               //SameSite = SameSiteMode.None,
+               // Secure = true
 
             });
 
             Response.Cookies.Append("signed", "", new CookieOptions
             {
                 Expires = DateTime.Now.AddMinutes(-1),
-                SameSite = SameSiteMode.None,
-                Secure = true
+                //SameSite = SameSiteMode.None,
+                //Secure = true
             });
 
             return Ok("Wylogowano");
@@ -109,28 +109,25 @@ namespace Xchanger_RestApi.Controllers
             }
         }
 
-        private string GenerateToken(User user)
+        private string GenerateAccessToken(User user)
         {
+            var secretKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config.GetSection("SecretKey").Value));
+            var algorithm = SecurityAlgorithms.HmacSha512Signature;
+            var credentials = new SigningCredentials(secretKey, algorithm);
+
             List<Claim> claims = new List<Claim>
             {
                 new Claim("name", user.Login),
                 new Claim("id", user.Id.ToString()),
                 new Claim("role", "User")
             };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("Security:Key").Value));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
+            JwtSecurityToken jwt = new JwtSecurityToken(
+                signingCredentials: credentials,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(5),
-                signingCredentials: credentials);
-
-            var jwtString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwtString;
+                expires: DateTime.Now.AddMinutes(15));
+                
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
         [HttpPost("refresh-token")]
@@ -151,7 +148,7 @@ namespace Xchanger_RestApi.Controllers
                 return Unauthorized("Zaloguj się");
             }
 
-            string token = GenerateToken(user);
+            string token = GenerateAccessToken(user);
             var newRefreshToken = GenerateRefreshToken();
             await SetRefreshToken(newRefreshToken, user.Login);
 
@@ -176,7 +173,6 @@ namespace Xchanger_RestApi.Controllers
 
         private RefreshToken GenerateRefreshToken()
         {
-
             string refreshTokenString;
             byte[] refreshTokenBytes = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
@@ -187,7 +183,7 @@ namespace Xchanger_RestApi.Controllers
             var refreshToken = new RefreshToken
             {
                 Token = refreshTokenString,
-                ExpireTime = DateTime.Now.AddMinutes(15),
+                ExpireTime = DateTime.Now.AddMinutes(180),
                 CreateTime = DateTime.Now
             };
 
@@ -196,50 +192,25 @@ namespace Xchanger_RestApi.Controllers
 
         private async Task SetRefreshToken(RefreshToken newRefreshToken, string userLogin)
         {
-
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, new CookieOptions
             {
                 HttpOnly = true,
                 Expires = newRefreshToken.ExpireTime,
-                SameSite = SameSiteMode.None,
-                Secure = true
-
+                //SameSite = SameSiteMode.None,
+                //Secure = true
             });
 
             Response.Cookies.Append("signed", "true", new CookieOptions
             {
                 Expires = newRefreshToken.ExpireTime,
-                SameSite = SameSiteMode.None,
-                Secure = true
+                //SameSite = SameSiteMode.None,
+               // Secure = true
             });
 
             await _repository.SetUserRefreshTokenAsync(userLogin, newRefreshToken.ExpireTime, newRefreshToken.CreateTime, newRefreshToken.Token);
-            //user.RefreshTokenExpireTime = newRefreshToken.ExpireTime;
-            //user.RefreshTokenCreateTime = newRefreshToken.CreateTime;
-            //user.RefreshToken = newRefreshToken.Token;
-
 
         }
 
-        //[HttpPut("{idItem}")]
-        //public async Task<IActionResult> UpdateItem([FromBody] ItemDTO itemDTO, [FromRoute] int idItem)
-        //{
-        //    try
-        //    {
-        //        var item = await _repository.UpdateItemAsync(idItem, itemDTO);
-
-        //        if (item == null)
-        //            return NotFound("Nie znaleziono przedmiotu");
-
-        //        return Ok(item);
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Wystąpił błąd wewnętrzny serwera \n" + ex);
-        //    }
-
-        //}
 
         [HttpGet("{login}")]
         public async Task<IActionResult> GetItemDtoAsync([FromRoute] string login)

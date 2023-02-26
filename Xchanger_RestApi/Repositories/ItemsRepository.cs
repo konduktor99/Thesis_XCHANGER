@@ -27,16 +27,16 @@ namespace Xchanger_RestApi.Repositories
         {
             IQueryable<Item> items;
             if ((category == null || category == "") && (user == null || user == ""))
-                 items = _dbContext.Items.Where(i => i.Active == true);
+                 items = _dbContext.Items.Where(i => i.Active == true).OrderByDescending(i => i.PublicationDate);
 
             else if (category == null || category == "")
-                items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user);
+                items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user).OrderByDescending(i => i.PublicationDate);
 
             else if (user == null || user == "")
-                items = _dbContext.Items.Where(i => i.Active == true && i.Categories.Name == category);
+                items = _dbContext.Items.Where(i => i.Active == true && i.Categories.Name == category).OrderByDescending(i => i.PublicationDate);
 
             else
-             items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user && i.Categories.Name == category);
+             items = _dbContext.Items.Where(i => i.Active == true && i.Users.Login == user && i.Categories.Name == category).OrderByDescending(i => i.PublicationDate);
 
             return await items.Select(i => new GetItemsDTO
             {

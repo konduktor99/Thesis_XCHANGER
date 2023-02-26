@@ -2,19 +2,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Xchanger_RestApi.Models;
 using Xchanger_RestApi.Repositories;
 
@@ -29,7 +23,7 @@ namespace Xchanger_RestApi
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+       
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -47,21 +41,7 @@ namespace Xchanger_RestApi
             );
 
 
-            services.AddSwaggerGen(options =>
-             {
-                 options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                 {
-                     Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
-                     In = ParameterLocation.Header,
-                     Name = "Authorization",
-                     Type = SecuritySchemeType.ApiKey
-                 });
-                 //options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-                 //{
-                 //    Version = "V1",
-                 //    Title = "Xchanger API",
-                 //});
-             });
+            services.AddSwaggerGen();
 
 
             services.AddAuthentication(x =>
@@ -70,7 +50,7 @@ namespace Xchanger_RestApi
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(o =>
             {
-                var Key = Encoding.UTF8.GetBytes(Configuration["Security:Key"]);
+                var Key = Encoding.UTF8.GetBytes(Configuration["SecretKey"]);
                 o.SaveToken = true;
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -86,19 +66,26 @@ namespace Xchanger_RestApi
 
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "AllowOrigin",
+                options.AddPolicy(name: "AllowWebApp",
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:8080")
                                             .AllowAnyHeader()
                                             .AllowAnyMethod()
+                                            .AllowCredentials();                
+                    });
+                options.AddPolicy(name: "AllowWebApp2",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://192.168.1.14:8080")
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod()
                                             .AllowCredentials();
-                                            
                     });
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+      
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -109,8 +96,10 @@ namespace Xchanger_RestApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseStaticFiles();
 
-            app.UseCors("AllowOrigin");
+            app.UseCors("AllowWebApp");
+            app.UseCors("AllowWebApp2");
 
             app.UseAuthentication();
 

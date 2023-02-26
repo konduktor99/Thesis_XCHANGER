@@ -14,7 +14,7 @@ using System.IO;
 
 namespace Xchanger_RestApi.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     
     public class CategoriesController : ControllerBase

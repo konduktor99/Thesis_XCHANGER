@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Xchanger_RestApi.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     
     public class ExchangesController : ControllerBase

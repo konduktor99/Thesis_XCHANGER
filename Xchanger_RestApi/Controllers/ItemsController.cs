@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Xchanger_RestApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Xchanger_RestApi.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     
     public class ItemsController : ControllerBase
@@ -183,7 +185,7 @@ namespace Xchanger_RestApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera" + ex);
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
 
             }
 
@@ -212,7 +214,7 @@ namespace Xchanger_RestApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(400, "Nieprawidłowe rządanie" + ex);
+                return StatusCode(400, "Nieprawidłowe rządanie");
             }
 
         }
@@ -220,10 +222,11 @@ namespace Xchanger_RestApi.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateItem([FromForm] CreateItemDTO itemDTO, [FromRoute] int idItem)
         {
-            
             try
             {
-                var userId = JwtDecoder.GetClaimFromJwt(Request.Headers["authorization"].ToString().Substring(7), "id");
+                var userId = JwtDecoder
+                    .GetClaimFromJwt(Request.Headers["authorization"].ToString().Substring(7), "id");
+
                 if (userId == null)
                     return Unauthorized();
 
@@ -236,20 +239,16 @@ namespace Xchanger_RestApi.Controllers
 
                 var updatedItem = await _repository.UpdateItemAsync(item, itemDTO);
 
-
-
                 var files = itemDTO.Files;
                 itemDTO.Files = null;
                 saveImages(files, updatedItem.Id);
 
                 return Ok(updatedItem);
-
             }
             catch (Exception ex)
             {
-                return StatusCode(400, "Nieprawidłowe rządanie");
+                return StatusCode(500, "Wystąpił błąd wewnętrzny serwera");
             }
-
         }
         [HttpDelete("DeleteItem/{idItem}")]
         [Authorize]
@@ -277,7 +276,7 @@ namespace Xchanger_RestApi.Controllers
 
                 return Ok(deletedItem);
 
-        }
+            }
             catch (Exception ex)
             {
                 return StatusCode(400, "Nieprawidłowe rządanie");
@@ -291,6 +290,10 @@ namespace Xchanger_RestApi.Controllers
             int counter = 1;
             if (files != null)
             {
+                if (string.IsNullOrWhiteSpace(_env.WebRootPath))
+                {
+                    _env.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                }
                 var path = Path.Combine(_env.WebRootPath, "itemPics", itemId.ToString());
                 if (Directory.Exists(path))
                     Directory.Delete(path,true);
@@ -298,14 +301,13 @@ namespace Xchanger_RestApi.Controllers
                 foreach (var file in files)
                 {
                     string picName = "\\" + counter + "_itemPic_" + itemId + ".jpg";
-
-                    if (System.IO.File.Exists(path + picName))
-                        System.IO.File.Delete(path + picName);
-
-                    using (FileStream fs = System.IO.File.Create(path + picName))
+                    int outWidth = 0;
+                    int outHeight = 0;
+                    using (var image = Image.Load(file.OpenReadStream()))
                     {
-                        file.CopyTo(fs);
-                        fs.Flush();
+                        ImageHandler.GetImgDims(image, 600, 600,ref outWidth,ref outHeight);
+                        image.Mutate(x => x.Resize(outWidth, outHeight));
+                        image.Save(path + picName);
                     }
                     counter++;
                 }
@@ -351,3 +353,5 @@ namespace Xchanger_RestApi.Controllers
 
 
 }
+
+

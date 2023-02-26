@@ -35,7 +35,7 @@ namespace Xchanger_RestApi.Repositories
                     Item = new { Id = e.Items.Id, Title = e.Items.Title, IsNew = e.Items.IsNew, Location = e.Items.Location, },
                     Item2 = new { Id = e.Items2.Id, Title = e.Items2.Title, IsNew = e.Items2.IsNew, Location = e.Items2.Location },
                 })
-                .OrderBy(e => e.RequestDate)
+                .OrderByDescending(e => e.RequestDate)
                 .ToListAsync();
         }
 
@@ -55,13 +55,15 @@ namespace Xchanger_RestApi.Repositories
                 Item = new {Id = e.Items.Id, Title = e.Items.Title, IsNew = e.Items.IsNew, Location = e.Items.Location, },
                 Item2 = new { Id = e.Items2.Id, Title = e.Items2.Title, IsNew = e.Items2.IsNew, Location = e.Items2.Location},
                 })
-                .OrderBy(e => e.RequestDate)
+                .OrderByDescending(e => e.RequestDate)
                 .ToListAsync();
         }
         public async Task<IEnumerable<GetExchangeDTO>> GetHistoricalExchangesAsync(int userId)
         {
-            return await _dbContext.Exchanges.Where(e => (e.Initiator.Id == userId || e.Items.UserId == userId) && (e.State == 2 || e.State == 3))
-                .Select(e => new GetExchangeDTO
+         return await _dbContext.Exchanges
+                .Where(e => 
+                      (e.Initiator.Id == userId || e.Items.UserId == userId) && (e.State == 2 || e.State == 3)    
+                ).Select(e => new GetExchangeDTO
                 {
                     Id = e.Id,
                     RequestDate = e.RequestDate,
@@ -70,10 +72,20 @@ namespace Xchanger_RestApi.Repositories
                     State = e.State,
                     Mess1 = e.Mess1,
                     Mess2 = e.Mess2,
-                    Initiator = new { Id = e.Initiator.Id, Login = e.Initiator.Login },
-                    Receiver = new { Id = e.Items.Users.Id, Login = e.Items.Users.Login },
-                    Item = new { Id = e.Items.Id, Title = e.Items.Title, IsNew = e.Items.IsNew, Location = e.Items.Location, },
-                    Item2 = new { Id = e.Items2.Id, Title = e.Items2.Title, IsNew = e.Items2.IsNew, Location = e.Items2.Location },
+                    Initiator = new {Id = e.Initiator.Id,Login = e.Initiator.Login},
+                    Receiver = new {Id = e.Items.Users.Id, Login = e.Items.Users.Login},
+                    Item = new {
+                                Id = e.Items.Id,
+                                Title = e.Items.Title,
+                                IsNew = e.Items.IsNew,
+                                Location = e.Items.Location
+                                },
+                    Item2 = new {
+                                Id = e.Items2.Id,
+                                Title = e.Items2.Title,
+                                IsNew = e.Items2.IsNew,
+                                Location = e.Items2.Location
+                                },
                 })
                 .OrderBy(e => e.AcceptDate)
                 .ToListAsync();
@@ -167,10 +179,8 @@ namespace Xchanger_RestApi.Repositories
 
         public async Task<bool> IsExchangeRequestedByUserAsync(int idItem, int userId)
         {
-            var isRequested1 = await _dbContext.Exchanges.AnyAsync(e => e.ItemId == idItem && e.InitiatorId == userId && (e.State == 0 || e.State == 1));
-            var isRequested2 = await _dbContext.Exchanges.AnyAsync(e => e.Item2Id == idItem && e.Items.UserId == userId && (e.State == 0 || e.State == 1));
-
-            return isRequested1 || isRequested2;
+            return await _dbContext.Exchanges.AnyAsync(e => (e.ItemId == idItem && e.InitiatorId == userId && (e.State == 0 || e.State == 1))
+            || (e.Item2Id == idItem && e.Items.UserId == userId && (e.State == 0 || e.State == 1)));
         }
 
 

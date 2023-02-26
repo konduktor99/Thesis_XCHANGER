@@ -28,29 +28,26 @@ namespace Xchanger_RestApi.Repositories
         public async Task<User> RegisterUserAsync(UserRegisterDTO userDTO)
         {
             User user = new User();
-            CreatePasswordHash(userDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            byte[] passHash, passSalt;
 
+            using (var hmacsha512 = new HMACSHA512())
+            {
+                passSalt = hmacsha512.Key;
+                passHash = hmacsha512.ComputeHash(Encoding.UTF8.GetBytes(userDTO.Password));
+            }
+
+            user.PasswordHash = passHash;
+            user.PasswordSalt = passSalt;
             user.Login = userDTO.Login;
             user.Email = userDTO.Email;
             user.PhoneNumber = userDTO.PhoneNumber;
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
             user.JoinDate = DateTime.Now;
-
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             return user;
         }
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-        }
 
         //public async Task<User> LoginUserAsync(User user, UserLoginDTO userDTO)
         //{
