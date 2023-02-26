@@ -10,14 +10,6 @@ import EditItemForm from './components/EditItemForm.vue'
 import ExchangesList from './components/ExchangesList.vue'
 
 const routes = [
-  // {
-  //   path: '/login',
-  //   name: 'LogIn',
-  //   component:
-  //    LogInForm
-     
-    
-  // },
   {
 
     path: '/',

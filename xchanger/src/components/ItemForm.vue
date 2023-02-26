@@ -23,12 +23,8 @@
 
           <div class="form-group">
            
-            <!-- <vue-google-autocomplete id="map" classname="form-control" placeholder="Start typing" v-on:placechanged="getAddressData"> -->
-            <!-- @place_changed="setPlace" -->
-            <!-- </vue-google-autocomplete> -->
-              <label for="address">Lokalizacja</label>
-             <GMapAutocomplete class="form-control" id="autocomplete-loc" placeholder="Wybierz lokalizację przedmiotu" :options="autocompleteOptions" @change="locationChanged"  @place_changed="validateLocation"  >           
-                    
+            <label for="address">Lokalizacja</label>
+            <GMapAutocomplete class="form-control" id="autocomplete-loc" placeholder="Wybierz lokalizację przedmiotu" :options="autocompleteOptions" @change="locationChanged"  @place_changed="validateLocation"  >                   
             </GMapAutocomplete>
           <span class="inputAlert" id="location-alert">{{locationError}}</span> 
           </div>

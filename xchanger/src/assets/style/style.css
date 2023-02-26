@@ -273,21 +273,9 @@ header{
     margin-left: 50px;
   }
   
-  .openbtn {
-    font-size: 20px;
-    cursor: pointer;
-    background-color: #111;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-  }
-  
-  .openbtn:hover {
-    background-color: #444;
-  }
 
 .button {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     border: none;
     color: white;
     padding: 16px 32px;
@@ -325,6 +313,7 @@ header{
     color:white;
     font-size:16px;
     border-width: 0;
+    z-index: 1;
 
   }
   
@@ -731,60 +720,24 @@ form textarea.correct-input {
         .form-buttons{
             grid-column:1 / 1;
         }
-
-        .table-narrow {
-            display:unset;
-            
-        }
         
-        .table-narrow {
-            
-            overflow: auto;
-        }
-        .list-actions{
 
-            max-height: 400px;
-            overflow: auto;
-        }
-        .table-wide{
-           display: none;
-        }
-
-        .table-narrow th,
-        .table-narrow td {
-            border: none;
-            padding: 0.15rem;
-            /* text-align:center; */
-            /* width: 100%; */
-        }
-        table{
-            height: 20px;
-            overflow: auto;
-        }
-  
-        
-        .table-narrow th{
-           background-color:  #eeeeed;
-           text-align: left;
-        }
-        .table-section{
-            border: 4px solid #365470;
-        }
-        
-       
-
-        .list-actions-button-details,
-        .list-actions-button-edit,
-        .list-actions-button-delete{
-            width: 30px;
-        }
         .search-form{
           margin:4px;
           width: 74%;
           margin-right: unset;
         }
         
-
+        .button-requests{
+          height: 60px;
+          top: 300px;
+        }
+        .item-form{
+    
+          width: 95%;
+        }
+  
+        
 
 }
 
@@ -809,9 +762,6 @@ form textarea.correct-input {
         text-align: start;
     }
 
-    .table-section{
-        border: 4px solid #b5a1cf;
-    }
 
     .main-main {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -830,6 +780,8 @@ form textarea.correct-input {
       .search-form{
         width: 100%;
       }
+
+
        
 }
 
@@ -877,6 +829,7 @@ form textarea.correct-input {
       top: 24px;
       height: 32px;
     }
+
 
     
   }

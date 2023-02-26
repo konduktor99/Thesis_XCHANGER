@@ -13,7 +13,7 @@ import Toaster from '@meforma/vue-toaster';
 
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-axios.defaults.baseURL = 'https://localhost:44320/'
+axios.defaults.baseURL = '/api' //'https://localhost:5001/'
 
 // createApp(App).use(Router).mount('#app')
 createApp(App)

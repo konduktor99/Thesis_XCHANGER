@@ -92,7 +92,7 @@ export default {
             let mess;
             switch (error.response.status) {
                 case 400:
-                  mess = "Nieprawidłowe rządanie"
+                  mess = "Nieprawidłowe żądanie"
                   break;
                 case 404:
                   mess = error.response.data
@@ -114,7 +114,7 @@ export default {
             let mess;
             switch (error.response.status) {
                 case 400:
-                  mess = "Nieprawidłowe rządanie"
+                  mess = "Nieprawidłowe żądanie"
                   break;
                 case 404:
                   mess = error.response.data
@@ -142,7 +142,7 @@ export default {
           let mess;
           switch (error.response.status) {
               case 400:
-                mess = "Nieprawidłowe rządanie"
+                mess = "Nieprawidłowe żądanie"
                 break;
               case 404:
                 mess = error.response.data

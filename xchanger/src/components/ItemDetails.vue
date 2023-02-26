@@ -1,50 +1,50 @@
 <template>
+<div>
+  <div class ="main-item" v-if="item && !error">
 
-<div class ="main-item" v-if="item && !error">
+      <div class="slideshow" >
 
-    <div class="slideshow" >
-        <!-- <img  src="../assets/images/kask3.png" alt="Card image cap"/> -->
-      <img name="slide"  style="width: 100%;" :src ="imageSrc"/>
-      <a v-if="imagesBytes.length>1" class="btn-prev"  @click="changeImgBackwards">&#10094;</a>
-      <a v-if="imagesBytes.length>1" class="btn-next" @click="changeImgForward">&#10095;</a>
-    </div>
-
-    <div class="details-item-user" >
-      <h3>{{item.title}}</h3>
-      <h4>{{item.user.login}}</h4>
-      <h5>{{item.location}}</h5>
-      <h5>{{item.user.phoneNumber}}</h5>
-      <b v-if="item.isNew" class="new-label">NOWE</b><b v-else class="used-label">UŻYWANE</b><br>
-      <!-- <b style="color:grey;">{{item.category.name}} </b><br> -->
-      <router-link :to="{ path: `/items`, query: {user:item.user.login}}" style="text-decoration: none; color: inherit;"><b>Więcej od tego ogłoszeniodawcy</b> <i class="fa fa-chevron-right" ></i></router-link><br/><br/>
-      <div v-if="loggedUser">
-      <div v-if="loggedUser!=item.user.login">
-      <button v-if="replyingExchange && !proceedExReq" type="button" @click="proceedExRequest" class="btn btn-success btn-block"> Wymień za {{this.exchangeItem}} <i class="fa fa-exchange" aria-hidden="true"></i></button>
-      <button v-else-if="!proceedExReq && !requested" type="button" @click="proceedExRequest" class="btn btn-success btn-block">Zaproponuj wymianę <i class="fa fa-exchange" aria-hidden="true"></i></button>
-      <div v-else-if="!requested">
-        <textarea class="form-control" v-model="requestMessage" id="desc" rows="2" maxlength="90" name="description" placeholder="Wiadomość do ogłoszeniodawcy" ></textarea>
-            <div class="article-tile-buttons" >
-              <button  class="btn btn-success" @click="exchange"><i class="fa fa-paper-plane" ></i></button>
-              <button  class="btn btn-secondary" @click="cancelExRequest" style="margin-left:5px;"><i class="fa fa-close" ></i></button>
-            </div>
+        <img name="slide"  style="width: 100%;" :src ="imageSrc"/>
+        <a v-if="imagesBytes.length>1" class="btn-prev"  @click="changeImgBackwards">&#10094;</a>
+        <a v-if="imagesBytes.length>1" class="btn-next" @click="changeImgForward">&#10095;</a>
       </div>
-      <b v-if="requested" class="already-requested-exchange">Zaproponowano wymianę <i class="fa fa-check-circle" ></i></b>
-      </div>
-      </div>
-      <router-link v-else to="/login" class="btn btn-success btn-block">Zaloguj się, by zaproponować wymianę.</router-link>
-      
-    </div>
 
-    <div class="description-item" >
-      <h4>Opis</h4>
-      <a >{{item.description}}</a>
+      <div class="details-item-user" >
+        <h3>{{item.title}}</h3>
+        <h4>{{item.user.login}}</h4>
+        <h5>{{item.location}}</h5>
+        <h5>{{item.user.phoneNumber}}</h5>
+        <b v-if="item.isNew" class="new-label">NOWE</b><b v-else class="used-label">UŻYWANE</b><br>
+        <!-- <b style="color:grey;">{{item.category.name}} </b><br> -->
+        <router-link :to="{ path: `/items`, query: {user:item.user.login}}" style="text-decoration: none; color: inherit;"><b>Więcej od tego ogłoszeniodawcy</b> <i class="fa fa-chevron-right" ></i></router-link><br/><br/>
+        <div v-if="loggedUser">
+        <div v-if="loggedUser!=item.user.login">
+        <button v-if="replyingExchange && !proceedExReq" type="button" @click="proceedExRequest" class="btn btn-success btn-block"> Wymień za {{this.exchangeItem}} <i class="fa fa-exchange" aria-hidden="true"></i></button>
+        <button v-else-if="!proceedExReq && !requested && item.active" type="button" @click="proceedExRequest" class="btn btn-success btn-block">Zaproponuj wymianę <i class="fa fa-exchange" aria-hidden="true"></i></button>
+        <div v-else-if="!requested && item.active">
+          <textarea class="form-control" v-model="requestMessage" id="desc" rows="2" maxlength="90" name="description" placeholder="Wiadomość do ogłoszeniodawcy" ></textarea>
+              <div class="article-tile-buttons" >
+                <button  class="btn btn-success" @click="exchange"><i class="fa fa-paper-plane" ></i></button>
+                <button  class="btn btn-secondary" @click="cancelExRequest" style="margin-left:5px;"><i class="fa fa-close" ></i></button>
+              </div>
+        </div>
+        <b v-if="requested && !replyingExchange" class="already-requested-exchange">Zaproponowano wymianę <i class="fa fa-check-circle" ></i></b>
+        </div>
+        </div>
+        <router-link v-else to="/login" class="btn btn-success btn-block">Zaloguj się, by zaproponować wymianę.</router-link>
+        
+      </div>
 
-    <!-- <img src="../assets/images/kask3.png" /> -->
-    </div>
-</div>
-<div v-else-if="!item && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
-<div v-if="error" id="error" style="text-align: center;"> 
- <h1 style="font-weight: bolder;color:rgb(147, 147, 186);">{{error}}</h1>
+      <div class="description-item" >
+        <h4>Opis</h4>
+        <a >{{item.description}}</a>
+
+      </div>
+  </div>
+  <div v-else-if="!item && !error" class="loader-wrapper"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
+  <div v-if="error" id="error" style="text-align: center;"> 
+  <h1 style="font-weight: bolder;color:rgb(147, 147, 186);">{{error}}</h1>
+  </div>
 </div>
 </template>
 
@@ -83,7 +83,7 @@ export default {
     },
   methods:{
 
-    proceedExRequest(){ console.log("ZLEe")
+    proceedExRequest(){ 
       this.proceedExReq = true
     },
     cancelExRequest(){
@@ -122,7 +122,7 @@ export default {
             default:
               mess = error.response.data
           }
-            this.error = `${error.response.status} ${mess} :(`    
+            this.error = `${mess} :(`    
           }
        });
        
@@ -151,7 +151,7 @@ export default {
               default:
                 mess = "Wystąpił błąd2"
             }
-          this.error = `${error.response.status} ${mess} :(`
+          this.error = `${mess} :(`
           console.log(this.error)
         });
       }else{
@@ -176,7 +176,7 @@ export default {
               default:
                 mess = "Wystąpił błąd2"
             }
-          this.error = `${error.response.status} ${mess} :(`
+          this.error = `${mess} :(`
           console.log(this.error)
         });
       }
@@ -211,7 +211,6 @@ export default {
   },
 
   beforeMount(){
-   // this.imageBytes =  this.imagesBytes[0];
  },
   mounted:function(){
       this.getItem(this.id);

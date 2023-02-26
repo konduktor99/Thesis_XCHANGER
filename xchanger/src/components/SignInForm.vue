@@ -51,7 +51,7 @@ import jwt_decode from 'jwt-decode'
 
 function checkDanger(value) {
     
-    var dangerous = /.*(?=.*[/)(><{}'-]).*/;
+    var dangerous = /.*(?=.*[)(><{}']).*/;
 
     if(String(value).match(dangerous))
         return true

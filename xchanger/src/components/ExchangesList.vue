@@ -153,7 +153,7 @@ export default {
               default:
                 mess = "Wystąpił błąd2"
             }
-          this.error = `${error.response.status} ${mess} :(`
+          this.error = `${mess} :(`
         });
 
       
@@ -276,7 +276,7 @@ export default {
               default:
                 mess = "Wystąpił błąd"
             }
-          this.error = `${error.response.status} ${mess} :(`
+          this.error = `${mess} :(`
           console.log(this.error)
         });
     },
